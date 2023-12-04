@@ -23,7 +23,7 @@ public class MainScreen {
     loginButton.setOnAction(event -> primaryStage.setScene(LoginScreen.getScene(primaryStage)));
 
     javafx.scene.control.Button registerButton = new javafx.scene.control.Button("Register");
-    registerButton.setOnAction(event -> primaryStage.setScene(RegisterScreen.getScene()));
+    registerButton.setOnAction(event -> primaryStage.setScene(RegisterScreen.getScene(primaryStage)));
 
     Button leaderboardButton = new Button("Leaderboard");
     leaderboardButton.setOnAction(event -> primaryStage.setScene(LeaderboardScreen.getScene()));
