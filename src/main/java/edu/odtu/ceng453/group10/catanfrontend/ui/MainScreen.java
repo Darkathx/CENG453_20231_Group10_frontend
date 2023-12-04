@@ -9,25 +9,24 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class MainScreen {
-  private final int width;
-  private final int height;
+  private static final int width;
+  private static final int height;
 
-  MainScreen(int width, int height) {
-    this.width = width;
-    this.height = height;
+  static {
+    width = 1920;
+    height = 1080;
   }
 
-  public Scene getScene(Stage primaryStage) {
+  public static Scene getScene(Stage primaryStage) {
 
     javafx.scene.control.Button loginButton = new javafx.scene.control.Button("Login");
-    loginButton.setOnAction(event -> {
-      primaryStage.setScene(LoginScreen.getScene());
-    });
+    loginButton.setOnAction(event -> primaryStage.setScene(LoginScreen.getScene(primaryStage)));
 
     javafx.scene.control.Button registerButton = new javafx.scene.control.Button("Register");
-    registerButton.setOnAction(event -> {
-      primaryStage.setScene(RegisterScreen.getScene());
-    });
+    registerButton.setOnAction(event -> primaryStage.setScene(RegisterScreen.getScene()));
+
+    Button leaderboardButton = new Button("Leaderboard");
+    leaderboardButton.setOnAction(event -> primaryStage.setScene(LeaderboardScreen.getScene()));
 
     Button exitButton = new Button("Exit");
     exitButton.setOnAction(event -> {
@@ -37,7 +36,8 @@ public class MainScreen {
 
     GridPane mainPane = new GridPane();
     mainPane.setAlignment(Pos.CENTER);
-    mainPane.setPadding(new Insets(height / 3, width / 3, height / 3, width / 3));
+    mainPane.setPadding(new Insets((double) height / 3, (double) width / 3, (double) height / 3, (double) width
+        / 3));
     mainPane.setHgap(7);
     mainPane.setVgap(7);
     mainPane.add(loginButton, 0, 0);
@@ -45,6 +45,6 @@ public class MainScreen {
     mainPane.add(leaderboardButton, 0, 2);
     mainPane.add(exitButton, 0, 3);
 
-    return new Scene(loginPane);
+    return new Scene(mainPane);
   }
 }
