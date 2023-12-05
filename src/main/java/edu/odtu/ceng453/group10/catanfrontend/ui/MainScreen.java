@@ -1,5 +1,6 @@
 package edu.odtu.ceng453.group10.catanfrontend.ui;
 
+import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -7,15 +8,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.springframework.boot.SpringApplication;
 
 public class MainScreen {
-  private static final int width;
-  private static final int height;
 
-  static {
-    width = 1920;
-    height = 1080;
-  }
 
   public static Scene getScene(Stage primaryStage) {
 
@@ -26,7 +22,7 @@ public class MainScreen {
     registerButton.setOnAction(event -> primaryStage.setScene(RegisterScreen.getScene(primaryStage)));
 
     Button leaderboardButton = new Button("Leaderboard");
-    leaderboardButton.setOnAction(event -> primaryStage.setScene(LeaderboardScreen.getScene()));
+    leaderboardButton.setOnAction(event -> primaryStage.setScene(LeaderboardScreen.getScene(primaryStage)));
 
     Button exitButton = new Button("Exit");
     exitButton.setOnAction(event -> {
@@ -36,8 +32,8 @@ public class MainScreen {
 
     GridPane mainPane = new GridPane();
     mainPane.setAlignment(Pos.CENTER);
-    mainPane.setPadding(new Insets((double) height / 3, (double) width / 3, (double) height / 3, (double) width
-        / 3));
+    double hPad = Settings.getHeight() / 3, vPad = Settings.getWidth() / 3;
+    mainPane.setPadding(new Insets(hPad, vPad, hPad, vPad));
     mainPane.setHgap(7);
     mainPane.setVgap(7);
     mainPane.add(loginButton, 0, 0);

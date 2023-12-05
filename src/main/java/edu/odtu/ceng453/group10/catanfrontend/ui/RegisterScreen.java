@@ -3,6 +3,8 @@ package edu.odtu.ceng453.group10.catanfrontend.ui;
 import edu.odtu.ceng453.group10.catanfrontend.requests.RegisterResponse;
 import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -33,7 +35,10 @@ public class RegisterScreen {
       Request registerRequest = new Request();
       RegisterResponse response = registerRequest.sendRegisterRequest(username, email, password);
       if(response.email().isEmpty()) {
-        System.out.println("This username/email has already taken");
+        Alert errorAlert = new Alert(AlertType.ERROR);
+        errorAlert.setHeaderText("Warning");
+        errorAlert.setContentText("This username/email has already taken.");
+        errorAlert.showAndWait();
       }
       primaryStage.setScene(MainScreen.getScene(primaryStage));
     });
