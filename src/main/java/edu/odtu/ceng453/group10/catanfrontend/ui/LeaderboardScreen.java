@@ -9,13 +9,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LeaderboardScreen {
+  private Scene mainScene;
 
-  public static Scene getScene(Stage primaryStage) {
+  public void setMainScene(Scene mainScene) {
+    this.mainScene = mainScene;
+  }
+
+  public Scene getScene(Stage primaryStage) {
     Button backButton = new Button("Back");
     backButton.setOnAction(e -> {
-      primaryStage.setScene(MainScreen.getScene(primaryStage));
+      primaryStage.setScene(mainScene);
     });
     Button weeklyButton = new Button("Weekly Leaderboard");
     weeklyButton.setOnAction(e -> {
@@ -51,7 +59,7 @@ public class LeaderboardScreen {
   }
 
 
-  private static Scene prepareLeaderboardScene(String[] leaderboard, LeaderboardType type, Stage primaryStage) {
+  private Scene prepareLeaderboardScene(String[] leaderboard, LeaderboardType type, Stage primaryStage) {
     String label = switch(type) {
       case LeaderboardType.WEEKLY: yield "WEEKLY LEADERBOARD";
       case LeaderboardType.MONTHLY: yield "MONTHLY LEADERBOARD";
@@ -66,7 +74,7 @@ public class LeaderboardScreen {
     }
     Button backButton = new Button("Back");
     backButton.setOnAction(e -> {
-      primaryStage.setScene(LeaderboardScreen.getScene(primaryStage));
+      primaryStage.setScene(getScene(primaryStage));
     });
     return new Scene(leaderboardPane);
   }

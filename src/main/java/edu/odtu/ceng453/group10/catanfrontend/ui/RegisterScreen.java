@@ -12,12 +12,20 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RegisterScreen {
+  private Scene mainScene;
 
-  public static Scene getScene(Stage primaryStage) {
+  public void setMainScene(Scene mainScene) {
+    this.mainScene = mainScene;
+  }
+
+  public Scene getScene(Stage primaryStage) {
     Button backButton = new Button("Back");
-    backButton.setOnAction(e -> primaryStage.setScene(MainScreen.getScene(primaryStage)));
+    backButton.setOnAction(e -> primaryStage.setScene(mainScene));
 
     GridPane registerPane = new GridPane();
 
@@ -41,7 +49,7 @@ public class RegisterScreen {
         errorAlert.setContentText("This username/email has already taken.");
         errorAlert.showAndWait();
       }
-      primaryStage.setScene(MainScreen.getScene(primaryStage));
+      primaryStage.setScene(mainScene);
     });
 
     registerPane.add(usernameLabel, 0, 0);

@@ -1,33 +1,37 @@
 package edu.odtu.ceng453.group10.catanfrontend.ui;
 
-import edu.odtu.ceng453.group10.catanfrontend.game.GameClient;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PlayScreen {
-  private final String username;
-  private final String email;
+  private final GameClient client;
+  private Scene mainScene;
 
-  PlayScreen(String username, String email) {
-    this.email = email;
-    this.username = username;
+  PlayScreen(GameClient client) {
+    this.client = client;
+  }
+
+  public void setMainScene(Scene mainScene) {
+    this.mainScene = mainScene;
   }
 
   public Scene getScene(Stage primaryStage) {
     Button logout = new Button("Logout");
     logout.setOnAction(e -> {
-      MainScreen.getScene(primaryStage);
+      primaryStage.setScene(mainScene);
     });
 
     Button singlePlayer = new Button("Single-player Mode");
     singlePlayer.setOnAction(e -> {
       Stage gameStage = new Stage();
-      GameClient client = new GameClient(email, username);
-      gameStage.setScene(client.getScene(gameStage));
+      gameStage.setScene(client.getGameScene(gameStage));
       gameStage.show();
     });
     Button multiPlayer = new Button("Multi-player Mode");

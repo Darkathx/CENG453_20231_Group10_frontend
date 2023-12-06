@@ -15,13 +15,29 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LoginScreen {
 
-  public static Scene getScene(Stage primaryStage) {
+  private final GameClient client;
+  private Scene mainScene;
+  private final PlayScreen playScreen;
+
+  LoginScreen(GameClient client, PlayScreen playScreen) {
+    this.client = client;
+    this.playScreen = playScreen;
+  }
+
+  public void setMainScene(Scene mainScene) {
+    this.mainScene = mainScene;
+  }
+
+  public Scene getScene(Stage primaryStage) {
 
     Button backButton = new Button("Back");
-    backButton.setOnAction(e -> primaryStage.setScene(MainScreen.getScene(primaryStage)));
+    backButton.setOnAction(e -> primaryStage.setScene(mainScene));
 
     GridPane loginPane = new GridPane();
     Label emailLabel = new Label("Email: ");
@@ -41,7 +57,7 @@ public class LoginScreen {
     return new Scene(loginPane, Settings.getWidth(), Settings.getHeight());
   }
 
-  private static Button getLoginButton(Stage primaryStage, TextField emailField,
+  private Button getLoginButton(Stage primaryStage, TextField emailField,
       PasswordField passwordField) {
     Button loginButton = new Button("Login");
     loginButton.setOnAction(e -> {
@@ -55,8 +71,8 @@ public class LoginScreen {
         errorAlert.setContentText("Wrong email/password.");
         errorAlert.showAndWait();
       }
-      PlayScreen screen = new PlayScreen(response.email(), response.username());
-      primaryStage.setScene(screen.getScene(primaryStage));
+      client.setEmailAndUsername(response.email(), response.username());
+      primaryStage.setScene(playScreen.getScene(primaryStage));
     });
     return loginButton;
   }
