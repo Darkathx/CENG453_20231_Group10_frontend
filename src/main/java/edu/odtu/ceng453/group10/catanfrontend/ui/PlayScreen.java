@@ -1,5 +1,6 @@
 package edu.odtu.ceng453.group10.catanfrontend.ui;
 
+import edu.odtu.ceng453.group10.catanfrontend.game.GameClient;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -24,7 +25,10 @@ public class PlayScreen {
 
     Button singlePlayer = new Button("Single-player Mode");
     singlePlayer.setOnAction(e -> {
-
+      Stage gameStage = new Stage();
+      GameClient client = new GameClient(email, username);
+      gameStage.setScene(client.getScene(gameStage));
+      gameStage.show();
     });
     Button multiPlayer = new Button("Multi-player Mode");
     multiPlayer.setOnAction(e -> {
@@ -33,7 +37,11 @@ public class PlayScreen {
       todo.setContentText("Multiplayer mode is not finished.");
       todo.showAndWait();
     });
-    return new Scene(new GridPane());
+    GridPane playPane = new GridPane();
+    playPane.add(singlePlayer, 0, 0);
+    playPane.add(multiPlayer, 0, 1);
+    playPane.add(logout, 0, 2);
+    return new Scene(playPane);
   }
 
 }

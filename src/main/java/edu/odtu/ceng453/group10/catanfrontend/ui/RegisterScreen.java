@@ -1,5 +1,6 @@
 package edu.odtu.ceng453.group10.catanfrontend.ui;
 
+import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
 import edu.odtu.ceng453.group10.catanfrontend.requests.RegisterResponse;
 import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
 import javafx.scene.Scene;
@@ -16,7 +17,7 @@ public class RegisterScreen {
 
   public static Scene getScene(Stage primaryStage) {
     Button backButton = new Button("Back");
-    backButton.setOnAction(e -> MainScreen.getScene(primaryStage));
+    backButton.setOnAction(e -> primaryStage.setScene(MainScreen.getScene(primaryStage)));
 
     GridPane registerPane = new GridPane();
 
@@ -51,6 +52,6 @@ public class RegisterScreen {
     registerPane.add(passwordField, 1, 2);
     registerPane.add(registerButton, 0, 3);
     registerPane.add(backButton, 0, 4);
-    return new Scene(registerPane);
+    return new Scene(registerPane, Settings.getWidth(), Settings.getHeight());
   }
 }

@@ -45,7 +45,7 @@ public class LeaderboardScreen {
     leaderboardPane.setAlignment(Pos.CENTER);
     leaderboardPane.add(weeklyButton, 0, 0);
     leaderboardPane.add(monthlyButton, 0, 1);
-    leaderboardPane.add(monthlyButton, 0, 2);
+    leaderboardPane.add(overallButton, 0, 2);
     leaderboardPane.add(backButton, 0, 3);
     return new Scene(leaderboardPane, Settings.getWidth(), Settings.getHeight());
   }

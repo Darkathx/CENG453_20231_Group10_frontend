@@ -1,7 +1,9 @@
 package edu.odtu.ceng453.group10.catanfrontend.ui;
 
+import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
 import edu.odtu.ceng453.group10.catanfrontend.requests.LoginResponse;
 import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
+import java.util.Set;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -19,7 +21,7 @@ public class LoginScreen {
   public static Scene getScene(Stage primaryStage) {
 
     Button backButton = new Button("Back");
-    backButton.setOnAction(e -> MainScreen.getScene(primaryStage));
+    backButton.setOnAction(e -> primaryStage.setScene(MainScreen.getScene(primaryStage)));
 
     GridPane loginPane = new GridPane();
     Label emailLabel = new Label("Email: ");
@@ -36,7 +38,7 @@ public class LoginScreen {
     loginPane.add(backButton, 0, 3);
     loginPane.setHgap(5.5);
     loginPane.setVgap(5.5);
-    return new Scene(loginPane);
+    return new Scene(loginPane, Settings.getWidth(), Settings.getHeight());
   }
 
   private static Button getLoginButton(Stage primaryStage, TextField emailField,
