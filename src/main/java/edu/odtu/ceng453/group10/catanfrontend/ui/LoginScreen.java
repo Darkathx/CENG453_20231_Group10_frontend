@@ -6,6 +6,7 @@ import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
 import java.util.Set;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -54,6 +55,7 @@ public class LoginScreen {
     loginPane.add(backButton, 0, 3);
     loginPane.setHgap(5.5);
     loginPane.setVgap(5.5);
+    loginPane.setAlignment(Pos.CENTER);
     return new Scene(loginPane, Settings.getWidth(), Settings.getHeight());
   }
 

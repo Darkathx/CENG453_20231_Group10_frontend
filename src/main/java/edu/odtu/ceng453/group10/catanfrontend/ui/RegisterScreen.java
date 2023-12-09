@@ -3,6 +3,7 @@ package edu.odtu.ceng453.group10.catanfrontend.ui;
 import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
 import edu.odtu.ceng453.group10.catanfrontend.requests.RegisterResponse;
 import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -60,6 +61,7 @@ public class RegisterScreen {
     registerPane.add(passwordField, 1, 2);
     registerPane.add(registerButton, 0, 3);
     registerPane.add(backButton, 0, 4);
+    registerPane.setAlignment(Pos.CENTER);
     return new Scene(registerPane, Settings.getWidth(), Settings.getHeight());
   }
 }

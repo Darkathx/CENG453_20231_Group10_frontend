@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MainScreen {
-  private LoginScreen loginScreen;
-  private RegisterScreen registerScreen;
-  private LeaderboardScreen leaderboardScreen;
+  private final LoginScreen loginScreen;
+  private final RegisterScreen registerScreen;
+  private final LeaderboardScreen leaderboardScreen;
   private Scene scene;
 
   MainScreen(LoginScreen loginScreen, RegisterScreen registerScreen, LeaderboardScreen leaderboardScreen) {
@@ -28,6 +28,7 @@ public class MainScreen {
 
 
   public Scene getScene(Stage primaryStage) {
+    if(scene != null) return scene;
 
     javafx.scene.control.Button loginButton = new javafx.scene.control.Button("Login");
     loginButton.setOnAction(event -> primaryStage.setScene(loginScreen.getScene(primaryStage)));

@@ -1,5 +1,6 @@
 package edu.odtu.ceng453.group10.catanfrontend.ui;
 
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -42,6 +43,7 @@ public class PlayScreen {
       todo.showAndWait();
     });
     GridPane playPane = new GridPane();
+    playPane.setAlignment(Pos.CENTER);
     playPane.add(singlePlayer, 0, 0);
     playPane.add(multiPlayer, 0, 1);
     playPane.add(logout, 0, 2);

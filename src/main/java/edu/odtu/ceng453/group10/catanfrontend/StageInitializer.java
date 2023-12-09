@@ -2,6 +2,9 @@ package edu.odtu.ceng453.group10.catanfrontend;
 
 import edu.odtu.ceng453.group10.catanfrontend.CatanGameApplication.StageReadyEvent;
 import edu.odtu.ceng453.group10.catanfrontend.ui.MainScreen;
+import edu.odtu.ceng453.group10.catanfrontend.ui.ResourcesComponent;
+import edu.odtu.ceng453.group10.catanfrontend.ui.ScoreboardComponent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
