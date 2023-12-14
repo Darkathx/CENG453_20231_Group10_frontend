@@ -1,5 +1,6 @@
 package edu.odtu.ceng453.group10.catanfrontend.ui;
 
+import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -13,10 +14,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlayScreen {
   private final GameClient client;
+  private final ResetScreen resetScreen;
   private Scene mainScene;
 
-  PlayScreen(GameClient client) {
+  PlayScreen(GameClient client, ResetScreen resetScreen) {
     this.client = client;
+    this.resetScreen = resetScreen;
   }
 
   public void setMainScene(Scene mainScene) {
@@ -27,6 +30,11 @@ public class PlayScreen {
     Button logout = new Button("Logout");
     logout.setOnAction(e -> {
       primaryStage.setScene(mainScene);
+    });
+
+    Button resetPassword = new Button("Reset Password");
+    resetPassword.setOnAction(e -> {
+      primaryStage.setScene(resetScreen.getScene(primaryStage));
     });
 
     Button singlePlayer = new Button("Single-player Mode");
@@ -47,7 +55,10 @@ public class PlayScreen {
     playPane.add(singlePlayer, 0, 0);
     playPane.add(multiPlayer, 0, 1);
     playPane.add(logout, 0, 2);
-    return new Scene(playPane);
+    Scene scene = new Scene(playPane);
+    resetScreen.setPlayScene(scene);
+    resetScreen.setMainScene(mainScene);
+    return scene;
   }
 
 }

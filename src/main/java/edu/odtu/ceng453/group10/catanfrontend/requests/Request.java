@@ -87,4 +87,26 @@ public class Request {
     return response.getBody();
   }
 
+  public boolean sendResetRequest(String email, String password) {
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    MultiValueMap<String, String> body= new LinkedMultiValueMap<>();
+    body.add("email", email);
+    body.add("newPassword", password);
+    HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+    try {
+      HttpEntity<RegisterResponse> response = restTemplate.exchange(
+          REGISTER_URL,
+          HttpMethod.PUT,
+          entity,
+          RegisterResponse.class
+      );
+      return true;
+    }
+    catch(RestClientException e) {
+      return false;
+    }
+  }
+
 }
