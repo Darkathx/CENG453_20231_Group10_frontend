@@ -73,8 +73,10 @@ public class LoginScreen {
         errorAlert.setContentText("Wrong email/password.");
         errorAlert.showAndWait();
       }
-      client.setEmailAndUsername(response.email(), response.username());
-      primaryStage.setScene(playScreen.getScene(primaryStage));
+      else {
+        client.setEmailAndUsername(response.email(), response.username());
+        primaryStage.setScene(playScreen.getScene(primaryStage));
+      }
     });
     return loginButton;
   }
