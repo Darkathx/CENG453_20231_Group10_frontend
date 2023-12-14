@@ -12,10 +12,6 @@ import java.util.Random;
 
 @Component
 public class GameController {
-
-  @FXML
-  public LineChart<String, Double> game;
-
   private Board board;
   public List<Player> players;
   private Random random;

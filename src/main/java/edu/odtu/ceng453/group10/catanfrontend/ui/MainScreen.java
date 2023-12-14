@@ -18,12 +18,15 @@ public class MainScreen {
   private final LoginScreen loginScreen;
   private final RegisterScreen registerScreen;
   private final LeaderboardScreen leaderboardScreen;
+  private final PlayScreen playScreen;
   private Scene scene;
 
-  MainScreen(LoginScreen loginScreen, RegisterScreen registerScreen, LeaderboardScreen leaderboardScreen) {
+  MainScreen(LoginScreen loginScreen, RegisterScreen registerScreen,
+              LeaderboardScreen leaderboardScreen, PlayScreen playScreen) {
     this.loginScreen = loginScreen;
     this.registerScreen = registerScreen;
     this.leaderboardScreen = leaderboardScreen;
+    this.playScreen = playScreen;
   }
 
 
@@ -59,6 +62,7 @@ public class MainScreen {
     registerScreen.setMainScene(scene);
     loginScreen.setMainScene(scene);
     leaderboardScreen.setMainScene(scene);
+    playScreen.setMainScene(scene);
 
     return scene;
   }

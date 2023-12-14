@@ -11,22 +11,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 public class Request {
 
-  private static final String LOGIN_URL = "";
-  private static final String REGISTER_URL = "";
-  private static final String LEADERBOARD_URL = "";
+  private static final String LOGIN_URL = "https://catan-backend-ds1e.onrender.com/userAccount/login";
+  private static final String REGISTER_URL = "https://catan-backend-ds1e.onrender.com/userAccount/register";
+  private static final String LEADERBOARD_URL = "https://catan-backend-ds1e.onrender.com/leaderboard";
 
   public LoginResponse sendLoginRequest(String email, String password) {
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-    headers.add("email", email);
-    headers.add("password", password);
-    HttpEntity<?> entity = new HttpEntity<>(headers);
+    MultiValueMap<String, String> body= new LinkedMultiValueMap<String, String>();
+    body.add("email", email);
+    body.add("password", password);
+    HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
 
     try {
       HttpEntity<LoginResponse> response = restTemplate.exchange(
@@ -47,10 +50,11 @@ public class Request {
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-    headers.add("username", username);
-    headers.add("email", email);
-    headers.add("password", password);
-    HttpEntity<?> entity = new HttpEntity<>(headers);
+    MultiValueMap<String, String> body= new LinkedMultiValueMap<String, String>();
+    body.add("username", username);
+    body.add("email", email);
+    body.add("password", password);
+    HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
 
     try {
       HttpEntity<RegisterResponse> response = restTemplate.exchange(
@@ -81,6 +85,28 @@ public class Request {
       return null;
     }
     return response.getBody();
+  }
+
+  public boolean sendResetRequest(String email, String password) {
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    MultiValueMap<String, String> body= new LinkedMultiValueMap<>();
+    body.add("email", email);
+    body.add("newPassword", password);
+    HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+    try {
+      HttpEntity<RegisterResponse> response = restTemplate.exchange(
+          REGISTER_URL,
+          HttpMethod.PUT,
+          entity,
+          RegisterResponse.class
+      );
+      return true;
+    }
+    catch(RestClientException e) {
+      return false;
+    }
   }
 
 }
