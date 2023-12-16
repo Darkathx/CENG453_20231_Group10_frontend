@@ -42,11 +42,15 @@ java -jar -Dspring.profiles.active=prod build/libs/catan-frontend-group10-0.0.1-
 
 ## Project Structure
 
-- `src/main/java/edu/odtu/ceng453/group10/catanfrontend`: Main application package.
+  - `src/main/java/edu/odtu/ceng453/group10/catanfrontend`: Main application package.
   - `/config`: Configuration classes (e.g., Settings, LeaderboardType).
   - `/game`: Consists of game mechanics related objects, such as Player, GameState, Tile...
   - `/requests`: Request object for sending requests to backend side of the project.
   - `/ui`: UI components of the project like main screen or leaderboard screens.
+ 
+ ## API Documentation
+
+  Visit [API Documentation - Swagger UI](https://catan-backend-ds1e.onrender.com/swagger-ui/index.html) for the interactive Swagger UI documentation of the API.
 
 ## Database Schema
 
