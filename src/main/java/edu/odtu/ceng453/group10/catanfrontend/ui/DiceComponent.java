@@ -1,5 +1,6 @@
 package edu.odtu.ceng453.group10.catanfrontend.ui;
 
+import edu.odtu.ceng453.group10.catanfrontend.game.GameState;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
@@ -35,30 +36,22 @@ public class DiceComponent {
       e.printStackTrace();
     }
   }
-  public GridPane getNewComponent() {
+  public GridPane getNewComponent(GameState state) {
     GridPane pane = new GridPane(5.5, 5.5);
-    int[] dice = rollDice();
+    int[] dice = state.getLastDiceRoll();
     ImageView dice1 = new ImageView(map.get(dice[0]));
     ImageView dice2 = new ImageView(map.get(dice[1]));
     dice1.setFitHeight(100.0);
     dice1.setFitWidth(100.0);
     dice2.setFitHeight(100.0);
     dice2.setFitWidth(100.0);
-    Button rollButton = new Button("Roll Dice");
-    rollButton.setOnAction(e -> {
-      int[] newDice = rollDice();
-      dice1.setImage(map.get(newDice[0]));
-      dice2.setImage(map.get(newDice[1]));
-      //TODO: Bind dice values to GameState
-    });
 
     pane.add(dice1, 0, 0);
     pane.add(dice2, 2, 0);
-    pane.add(rollButton, 1, 1);
     return pane;
   }
 
-  private int[] rollDice() {
+  public int[] rollDice() {
     int[] dice = new int[2];
     Random rn = new Random();
     dice[0] = rn.nextInt(6) + 1;

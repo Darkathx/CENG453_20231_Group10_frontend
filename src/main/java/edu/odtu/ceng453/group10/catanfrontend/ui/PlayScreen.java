@@ -40,7 +40,7 @@ public class PlayScreen {
     Button singlePlayer = new Button("Single-player Mode");
     singlePlayer.setOnAction(e -> {
       Stage gameStage = new Stage();
-      gameStage.setScene(client.getGameScene(gameStage));
+      client.playSingleGame(gameStage);
       gameStage.show();
     });
     Button multiPlayer = new Button("Multi-player Mode");
