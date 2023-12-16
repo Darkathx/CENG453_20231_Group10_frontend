@@ -11,7 +11,7 @@ import edu.odtu.ceng453.group10.catanfrontend.game.Tile;
 
 
 public class Board {
-    private final List<Tile> tiles;
+    private static List<Tile> tiles;
     private static final Logger LOGGER = Logger.getLogger(Board.class.getName());
 
     private static final double RADIUS = 50; // Tile radius
@@ -63,8 +63,11 @@ public class Board {
                 double y = startY + row * (APOTHEM * 2);
                 Point2D center = new Point2D(x + RADIUS, y + RADIUS);
                 tile.setCenter(center);
+                tile.getHexagon().setTranslateX(x);
+                tile.getHexagon().setTranslateY(y);
             }
         }
+        setTiles(tilesList);
     }
     private void addTilesOfType(List<Tile> tilesList, TileType type, int count, ResourceType resource) {
         for (int i = 0; i < count; i++) {
@@ -100,6 +103,9 @@ public class Board {
 
     public List<Tile> getTiles() {
         return tiles;
+    }
+    public void setTiles(List<Tile> tiles) {
+        this.tiles = tiles;
     }
     private void initializeNetwork() {
         for (Tile tile : tiles) {
