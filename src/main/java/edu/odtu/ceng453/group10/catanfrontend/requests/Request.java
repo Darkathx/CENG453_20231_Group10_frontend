@@ -1,6 +1,8 @@
 package edu.odtu.ceng453.group10.catanfrontend.requests;
 
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.fasterxml.jackson.databind.util.JSONWrappedObject;
 import edu.odtu.ceng453.group10.catanfrontend.config.LeaderboardType;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ public class Request {
   private static final String LOGIN_URL = "https://catan-backend-ds1e.onrender.com/userAccount/login";
   private static final String REGISTER_URL = "https://catan-backend-ds1e.onrender.com/userAccount/register";
   private static final String LEADERBOARD_URL = "https://catan-backend-ds1e.onrender.com/leaderboard";
+  private static final String RESULT_URL = "https://catan-backend-ds1e.onrender.com/gameRecord/create";
 
   public LoginResponse sendLoginRequest(String email, String password) {
     RestTemplate restTemplate = new RestTemplate();
@@ -70,7 +73,7 @@ public class Request {
     }
   }
 
-  public String[] sendLeaderboardRequest(LeaderboardType type){
+  public LeaderboardResponse[] sendLeaderboardRequest(LeaderboardType type){
     String fullUrl = LEADERBOARD_URL;
     switch (type) {
       case LeaderboardType.WEEKLY -> fullUrl += "/weekly";
@@ -79,12 +82,9 @@ public class Request {
     }
 
     RestTemplate restTemplate = new RestTemplate();
-    ResponseEntity<String[]> response = restTemplate.getForEntity(fullUrl, String[].class);
-    HttpStatusCode responseStatus = response.getStatusCode();
-    if(responseStatus != HttpStatus.ACCEPTED) {
-      return null;
-    }
-    return response.getBody();
+    ResponseEntity<LeaderboardResponse[]> response = restTemplate.getForEntity(fullUrl, LeaderboardResponse[].class);
+    LeaderboardResponse[] responseBody = response.getBody();
+    return responseBody;
   }
 
   public boolean sendResetRequest(String email, String password) {
@@ -106,6 +106,23 @@ public class Request {
     }
     catch(RestClientException e) {
       return false;
+    }
+  }
+
+  public void saveGameResult(String username, int score) {
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<RecordObject> entity = new HttpEntity<>(new RecordObject(username, null, null, null, score, 0, 0, 0), headers);
+    try {
+      HttpEntity<?> response = restTemplate.postForEntity(
+          RESULT_URL,
+          entity,
+          RecordObject.class
+      );
+    }
+    catch(RestClientException e) {
+      System.out.println("Error while saving game result");
     }
   }
 
