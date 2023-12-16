@@ -1,4 +1,4 @@
-# Group10 - Catan - Backend Development
+# Group10 - Catan - Frontend Development
 
 This module consists of the implentations for client-side development of desktop application of our Catan game.
 
