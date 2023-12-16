@@ -3,8 +3,14 @@ package edu.odtu.ceng453.group10.catanfrontend.ui;
 import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
 import edu.odtu.ceng453.group10.catanfrontend.game.GameState;
 import edu.odtu.ceng453.group10.catanfrontend.GameController;
+import edu.odtu.ceng453.group10.catanfrontend.game.Player;
+import edu.odtu.ceng453.group10.catanfrontend.requests.LoginResponse;
+import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
@@ -47,22 +53,31 @@ public class GameClient {
   }
 
   public Scene getGameScene(Stage gameStage) {
+    Player winnerPlayer = checkWinCondition();
+    if(winnerPlayer != null) {
+      Request request = new Request();
+      request.saveGameResult(winnerPlayer.getName(), winnerPlayer.getPoints());
+      Alert alert = new Alert(Alert.AlertType.INFORMATION);
+      alert.setTitle("Game Over");
+      alert.setContentText("Winner is " + winnerPlayer.getName() + " with " + winnerPlayer.getPoints() + " points!");
+      alert.showAndWait();
+      gameStage.close();
+      System.exit(0);
+    }
     BorderPane totalPane = new BorderPane();
     BorderPane.setAlignment(boardView, Pos.CENTER);
     totalPane.setCenter(boardView);
-    HBox bottomContainer = new HBox();
+    HBox bottomContainer = new HBox(250);
+    bottomContainer.setAlignment(Pos.CENTER);
     GridPane diceContainer = diceComponent.getNewComponent(state);
     diceContainer.add(getRollButton(gameStage), 1, 1);
-    bottomContainer.getChildren().addAll(diceContainer, resourcesComponent.getNewComponent(state));
+    bottomContainer.getChildren().addAll(diceContainer, getEndTurnButton(gameStage), resourcesComponent.getNewComponent(state));
     totalPane.setBottom(bottomContainer);
-
-    VBox rightContainer = new VBox();
+    VBox rightContainer = new VBox(100);
+    rightContainer.setAlignment(Pos.CENTER);
     Text currentTurn = new Text("Current Turn: " + state.getCurrentPlayer().getName());
     rightContainer.getChildren().addAll(currentTurn, scoreboardComponent.getScoreboard(state));
     totalPane.setRight(rightContainer);
-
-    totalPane.setTop(getEndTurnButton(gameStage));
-
     Scene gameScene = new Scene(totalPane);
     gameScene.setOnKeyPressed(e -> {
       if(e.getCode() == KeyCode.ESCAPE) {
@@ -111,5 +126,25 @@ public class GameClient {
     return new Scene(escPane, Settings.getWidth(), Settings.getHeight());
   }
 
+
   // Additional methods as needed
+  private Player checkWinCondition() {
+    List<Player> players = state.getPlayers();
+    Player winnerPlayer = null;
+    for(Player player : players) {
+      if(player.getPoints() >= 8) {
+        if(winnerPlayer == null) {
+          winnerPlayer = player;
+        }
+        else {
+          if(player.getPoints() > winnerPlayer.getPoints()) {
+            winnerPlayer = player;
+          }
+        }
+      }
+    }
+    return winnerPlayer;
+  }
+
+
 }

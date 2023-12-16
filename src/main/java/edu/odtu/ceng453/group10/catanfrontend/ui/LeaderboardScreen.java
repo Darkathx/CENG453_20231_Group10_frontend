@@ -2,6 +2,7 @@ package edu.odtu.ceng453.group10.catanfrontend.ui;
 
 import edu.odtu.ceng453.group10.catanfrontend.config.LeaderboardType;
 import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
+import edu.odtu.ceng453.group10.catanfrontend.requests.LeaderboardResponse;
 import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -28,7 +29,7 @@ public class LeaderboardScreen {
     Button weeklyButton = new Button("Weekly Leaderboard");
     weeklyButton.setOnAction(e -> {
       Request request = new Request();
-      String[] leaderboard = request.sendLeaderboardRequest(LeaderboardType.WEEKLY);
+      LeaderboardResponse[] leaderboard = request.sendLeaderboardRequest(LeaderboardType.WEEKLY);
       Scene leaderboardScene = prepareLeaderboardScene(leaderboard, LeaderboardType.WEEKLY, primaryStage);
       primaryStage.setScene(leaderboardScene);
     });
@@ -36,7 +37,7 @@ public class LeaderboardScreen {
     Button monthlyButton = new Button("Monthly Leaderboard");
     monthlyButton.setOnAction(e -> {
       Request request = new Request();
-      String[] leaderboard = request.sendLeaderboardRequest(LeaderboardType.MONTHLY);
+      LeaderboardResponse[] leaderboard = request.sendLeaderboardRequest(LeaderboardType.MONTHLY);
       Scene leaderboardScene = prepareLeaderboardScene(leaderboard, LeaderboardType.MONTHLY, primaryStage);
       primaryStage.setScene(leaderboardScene);
     });
@@ -44,7 +45,7 @@ public class LeaderboardScreen {
     Button overallButton = new Button("Overall Leaderboard");
     overallButton.setOnAction(e -> {
       Request request = new Request();
-      String[] leaderboard = request.sendLeaderboardRequest(LeaderboardType.OVERALL);
+      LeaderboardResponse[] leaderboard = request.sendLeaderboardRequest(LeaderboardType.OVERALL);
       Scene leaderboardScene = prepareLeaderboardScene(leaderboard, LeaderboardType.OVERALL, primaryStage);
       primaryStage.setScene(leaderboardScene);
     });
@@ -59,7 +60,7 @@ public class LeaderboardScreen {
   }
 
 
-  private Scene prepareLeaderboardScene(String[] leaderboard, LeaderboardType type, Stage primaryStage) {
+  private Scene prepareLeaderboardScene(LeaderboardResponse[] leaderboard, LeaderboardType type, Stage primaryStage) {
     String label = switch(type) {
       case LeaderboardType.WEEKLY: yield "WEEKLY LEADERBOARD";
       case LeaderboardType.MONTHLY: yield "MONTHLY LEADERBOARD";
@@ -69,13 +70,14 @@ public class LeaderboardScreen {
     leaderboardPane.setAlignment(Pos.CENTER);
     leaderboardPane.add(new Label(label), 0, 0);
     for(int i = 0; i < 10; i++) {
-      Label curLabel = new Label(String.valueOf(i) + ": " + leaderboard[i]);
+      Label curLabel = new Label((i+1) + ": " + leaderboard[i].username() + "---" + leaderboard[i].score());
       leaderboardPane.add(curLabel, 0, i + 1);
     }
     Button backButton = new Button("Back");
     backButton.setOnAction(e -> {
       primaryStage.setScene(getScene(primaryStage));
     });
+    leaderboardPane.add(backButton, 0, 11);
     return new Scene(leaderboardPane);
   }
 }
