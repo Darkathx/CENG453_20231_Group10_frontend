@@ -1,9 +1,13 @@
 package edu.odtu.ceng453.group10.catanfrontend.game;
 
+import edu.odtu.ceng453.group10.catanfrontend.GameController;
 import org.springframework.stereotype.Component;
+
 
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.paint.Color;
+
 
 @Component
 public class GameState {
@@ -12,6 +16,7 @@ public class GameState {
     private int currentPlayerIndex;
     private int[] lastDiceRoll;
     private boolean diceRolled;
+
 
     public GameState() {
         board = new Board();
@@ -61,11 +66,16 @@ public class GameState {
     public Player getCurrentPlayer() {
         return players.get(currentPlayerIndex);
     }
+    public static final Color[] PLAYER_COLORS = {
+            Color.RED, Color.BLUE, Color.GREEN, Color.ORANGE, Color.PURPLE, Color.BROWN
+            // Add more colors as needed
+    };
     public void initializeSingleGame(String username) {
-        players.add(new Player(username, new ResourceCardDeck()));
-        players.add(new Player("AI1", new ResourceCardDeck()));
-        players.add(new Player("AI2", new ResourceCardDeck()));
-        players.add(new Player("AI3", new ResourceCardDeck()));
+        players.add(new Player(username, new ResourceCardDeck(), PLAYER_COLORS[0]));
+
+        players.add(new Player("AI1", new ResourceCardDeck(),PLAYER_COLORS[1]));
+        players.add(new Player("AI2", new ResourceCardDeck(), PLAYER_COLORS[2]));
+        players.add(new Player("AI3", new ResourceCardDeck(), PLAYER_COLORS[3]));
         randomStartingPlayer();
     }
     private void randomStartingPlayer() {

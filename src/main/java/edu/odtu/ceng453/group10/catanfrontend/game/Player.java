@@ -4,19 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import edu.odtu.ceng453.group10.catanfrontend.GameController;
+import javafx.scene.paint.Color;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 public class Player {
     private String name;
     private ResourceCardDeck resourceCards;
     public List<Settlement> settlements;
     public List<Road> roads;
     private int points;
+    private Color playerColor;
+    private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
 
-    public Player(String name, ResourceCardDeck resourceCards) {
+
+
+    public Player(String name, ResourceCardDeck resourceCards, Color color) {
         this.name = name;
         this.resourceCards = resourceCards;
         this.settlements = new ArrayList<>();
         this.roads = new ArrayList<>();
         this.points = 0;
+        this.playerColor = color;
     }
 
     // Getters and setters
@@ -30,6 +40,9 @@ public class Player {
 
     public int getPoints() {
         return points;
+    }
+    public Color getPlayerColor() {
+        return playerColor;
     }
 
     public int addPoints(int points) {
@@ -46,6 +59,8 @@ public class Player {
     }
 
     public List<Settlement> getSettlements() {
+        LOGGER.info("Get sttlements to add" + this.settlements);
+
         return settlements;
     }
 
@@ -66,9 +81,8 @@ public class Player {
         return resourceCards.canDeduct(Settlement.COST);
     }
 
-    public boolean buildSettlement(Vertex vertex) {
-        if (vertex.isAvailable() && canBuildSettlement()) {
-            Settlement settlement = new Settlement(vertex);
+    public boolean buildSettlement(Settlement settlement) {
+        if (settlement.getLocation().isAvailable() && canBuildSettlement()) {
             settlements.add(settlement);
             resourceCards.deduct(Settlement.COST);
             return true;
@@ -81,9 +95,8 @@ public class Player {
         return resourceCards.canDeduct(Road.COST);
     }
 
-    public boolean buildRoad(Edge edge) {
-        if (edge.isAvailable() && canBuildRoad()) {
-            Road road = new Road(edge);
+    public boolean buildRoad(Road road) {
+        if (road.getLocation().isAvailable() && canBuildRoad()) {
             roads.add(road);
             resourceCards.deduct(Road.COST);
             return true;
@@ -99,12 +112,5 @@ public class Player {
         if (canBuildSettlement()) {
             resourceCards.deduct(Settlement.COST);
         }
-    }
-    public void addRoad(Road road) {
-        roads.add(road);
-    }
-
-    public void addSettlement(Settlement settlement) {
-        settlements.add(settlement);
     }
 }

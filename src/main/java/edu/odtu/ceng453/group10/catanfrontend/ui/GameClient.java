@@ -2,6 +2,7 @@ package edu.odtu.ceng453.group10.catanfrontend.ui;
 
 import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
 import edu.odtu.ceng453.group10.catanfrontend.game.GameState;
+import edu.odtu.ceng453.group10.catanfrontend.GameController;
 import edu.odtu.ceng453.group10.catanfrontend.game.Player;
 import edu.odtu.ceng453.group10.catanfrontend.requests.LoginResponse;
 import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
@@ -19,27 +20,25 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.springframework.stereotype.Component;
-import edu.odtu.ceng453.group10.catanfrontend.game.Board;
-import edu.odtu.ceng453.group10.catanfrontend.game.Tile;
 
 @Component
 public class GameClient {
   private String username;
-  private Board board;
-  private BoardView boardView;
   private GameState state;
+  private BoardView boardView;
+  private GameController gameController;
   private ResourcesComponent resourcesComponent;
   private ScoreboardComponent scoreboardComponent;
   private DiceComponent diceComponent;
 
-  public GameClient(GameState state, DiceComponent diceComponent,
-          ResourcesComponent resourcesComponent, ScoreboardComponent scoreboardComponent) {
-    this.state = state;
-    this.board = state.getBoard(); // Get the board from the GameState
-    this.boardView = new BoardView(board.getTiles().toArray(new Tile[0])); // Create BoardView
+  public GameClient(GameState gameState, DiceComponent diceComponent,
+                    ResourcesComponent resourcesComponent, ScoreboardComponent scoreboardComponent) {
+    this.state = gameState;
+    this.gameController = new GameController(gameState);
     this.diceComponent = diceComponent;
     this.resourcesComponent = resourcesComponent;
     this.scoreboardComponent = scoreboardComponent;
+    this.boardView = new BoardView(gameState, gameController);
   }
 
   public void setUsername(String username) {
@@ -48,6 +47,8 @@ public class GameClient {
 
   public void playSingleGame(Stage stage) {
     state.initializeSingleGame(username);
+    gameController.setupInitialBoard();
+    boardView.updateBoardView(state);
     stage.setScene(getGameScene(stage));
   }
 
@@ -83,11 +84,8 @@ public class GameClient {
         gameStage.setScene(getEscScene(gameStage));
       }
     });
-    return gameScene;
-  }
 
-  public BoardView getBoardView() {
-    return boardView;
+    return gameScene;
   }
 
   private Button getRollButton(Stage stage) {
@@ -95,15 +93,11 @@ public class GameClient {
     rollButton.setOnAction(e -> {
       int[] dice = diceComponent.rollDice();
       state.setLastDiceRoll(dice);
-      //TODO: distribute resources
+      // Logic to distribute resources based on dice roll
+      // Refresh the game scene to reflect changes
       stage.setScene(getGameScene(stage));
     });
-    if(state.getCurrentPlayer().getName().equals(state.getPlayers().get(0).getName())) {
-      rollButton.setDisable(false);
-    }
-    else {
-      rollButton.setDisable(true);
-    }
+    rollButton.setDisable(!isPlayerTurn());
     return rollButton;
   }
 
@@ -111,30 +105,29 @@ public class GameClient {
     Button endTurnButton = new Button("End Turn");
     endTurnButton.setOnAction(e -> {
       state.setCurrentPlayerIndex((state.getCurrentPlayerIndex() + 1) % state.getPlayers().size());
+      state.unsetDiceRolled();
+      // Refresh the game scene for the next player
       stage.setScene(getGameScene(stage));
-      //TODO: AI PLAYS HERE
     });
-    if(state.getCurrentPlayer().getName().equals(state.getPlayers().get(0).getName()) && state.getDiceRolled()) {
-      endTurnButton.setDisable(false);
-    }
-    else {
-      endTurnButton.setDisable(true);
-    }
+    endTurnButton.setDisable(!isPlayerTurn() || !state.getDiceRolled());
     return endTurnButton;
+  }
+
+  private boolean isPlayerTurn() {
+    return state.getCurrentPlayer().getName().equals(username);
   }
 
   private Scene getEscScene(Stage gameStage) {
     GridPane escPane = new GridPane();
     escPane.setAlignment(Pos.CENTER);
-    escPane.setOnKeyPressed(e -> getGameScene(gameStage));
     Button quitButton = new Button("Quit");
-    quitButton.setOnAction(e -> {
-      gameStage.close();
-    });
+    quitButton.setOnAction(e -> gameStage.close());
     escPane.add(quitButton, 0, 0);
     return new Scene(escPane, Settings.getWidth(), Settings.getHeight());
   }
 
+
+  // Additional methods as needed
   private Player checkWinCondition() {
     List<Player> players = state.getPlayers();
     Player winnerPlayer = null;

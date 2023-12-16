@@ -1,14 +1,22 @@
 package edu.odtu.ceng453.group10.catanfrontend.game;
 
+import edu.odtu.ceng453.group10.catanfrontend.GameController;
 import javafx.geometry.Point2D;
 import java.util.*;
 import java.util.stream.Collectors;
+import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
+import java.util.logging.Logger;
 
 import edu.odtu.ceng453.group10.catanfrontend.game.Tile;
 
 
 public class Board {
     private final List<Tile> tiles;
+    private static final Logger LOGGER = Logger.getLogger(Board.class.getName());
+
+    private static final double RADIUS = 50; // Tile radius
+    private static final double APOTHEM = RADIUS * Math.sqrt(3) / 2; // Height from center to side
+    private static final double GAP = 20; // Gap between tiles
     private final int[] rowLengths = {3, 4, 5, 4, 3}; // Hexagons per row
     private Map<String, Vertex> vertexMap = new HashMap<>();
 
@@ -17,10 +25,14 @@ public class Board {
         tiles = initializeTiles();
         initializeNetwork();
     }
-
     private List<Tile> initializeTiles() {
         List<Tile> tilesList = new ArrayList<>();
-
+        createTiles(tilesList);
+        assignNumbersToTiles(tilesList);
+        setTilePositions(tilesList);
+        return tilesList;
+    }
+    private void createTiles(List<Tile> tilesList){
         // Create one desert tile without a resource type or number
         tilesList.add(new Tile(TileType.DESERT, null, null, 0, 0));
 
@@ -34,22 +46,26 @@ public class Board {
         // Shuffle the tiles, ensuring the desert is in the center
         Collections.shuffle(tilesList);
         moveDesertToCenter(tilesList);
-
-        // Assign numbers to the tiles
-        assignNumbersToTiles(tilesList);
-
-        int tileIndex = 0;
-        for (int row = 0; row < rowLengths.length; row++) {
-            for (int col = 0; col < rowLengths[row]; col++) {
-                Tile tile = tilesList.get(tileIndex++);
-                tile.setRow(row);
-                tile.setCol(col);
-            }
-        }
-
-                return tilesList;
     }
 
+    private void setTilePositions(List<Tile> tilesList) {
+        // Set positions of tiles based on row and column
+        double maxWidth = 5 * (RADIUS * 3 / 2) + (4 * GAP);
+        double totalHeight = 5 * (APOTHEM * 2);
+        double startY = (Settings.getHeight() - totalHeight) / 2;
+        int tileIndex = 0;
+        for (int row = 0; row < rowLengths.length; row++) {
+            double currentRowWidth = rowLengths[row] * (RADIUS * 3 / 2) + ((rowLengths[row] - 1) * GAP);
+            double startX = (Settings.getWidth() - maxWidth) / 2 + (maxWidth - currentRowWidth) / 2;
+            for (int col = 0; col < rowLengths[row]; col++) {
+                Tile tile = tilesList.get(tileIndex++);
+                double x = startX + col * (RADIUS * 3 / 2 + GAP);
+                double y = startY + row * (APOTHEM * 2);
+                Point2D center = new Point2D(x + RADIUS, y + RADIUS);
+                tile.setCenter(center);
+            }
+        }
+    }
     private void addTilesOfType(List<Tile> tilesList, TileType type, int count, ResourceType resource) {
         for (int i = 0; i < count; i++) {
             tilesList.add(new Tile(type, resource, 0,0 , 0)); // Initialize with dummy number 0
@@ -85,42 +101,33 @@ public class Board {
     public List<Tile> getTiles() {
         return tiles;
     }
-
     private void initializeNetwork() {
-        int tileIndex = 0;
-        for (int row = 0; row < rowLengths.length; row++) {
-            for (int col = 0; col < rowLengths[row]; col++) {
-                Tile tile = tiles.get(tileIndex++);
-                List<Vertex> tileVertices = new ArrayList<>();
-                List<Edge> tileEdges = new ArrayList<>();
-
-                // Assuming each tile has 6 vertices and 6 edges
-                for (int i = 0; i < 6; i++) {
-                    Vertex vertex = findOrCreateVertexAt(tile, i);
-                    tileVertices.add(vertex);
-
-                    Edge edge = findOrCreateEdgeBetween(tile, i, (i + 1) % 6);
-                    tileEdges.add(edge);
-                }
-
-                tile.setVertices(tileVertices);
-                tile.setEdges(tileEdges);
-            }
-        }
         for (Tile tile : tiles) {
-            List<Vertex> tileVertices = tile.getVertices();
-            for (int i = 0; i < tileVertices.size(); i++) {
-                Vertex currentVertex = tileVertices.get(i);
+            // Iterate over each vertex index for a hexagon (6 sides)
+            for (int i = 0; i < 6; i++) {
+                Vertex vertex1 = findOrCreateVertexAt(tile, i);
+                Vertex vertex2 = findOrCreateVertexAt(tile, (i + 1) % 6);
+                Edge edge = findOrCreateEdgeBetween(vertex1, vertex2);
+
+                tile.addVertex(vertex1);
+                tile.addEdge(edge);
 
                 // Connect the vertex to its adjacent edges
-                Edge edge1 = findOrCreateEdgeBetween(tile, i, (i + 1) % 6);
-                Edge edge2 = findOrCreateEdgeBetween(tile, i, (i + 6 - 1) % 6);
-                currentVertex.addConnectedEdge(edge1);
-                currentVertex.addConnectedEdge(edge2);
+                vertex1.addConnectedEdge(edge);
+                vertex2.addConnectedEdge(edge);
             }
         }
     }
 
+    private void connectVerticesWithEdges() {
+        for (Vertex vertex : vertexMap.values()) {
+            for (Edge edge : edgeMap.values()) {
+                if (edge.involves(vertex)) {
+                    vertex.addConnectedEdge(edge);
+                }
+            }
+        }
+    }
     private Point2D calculateVertexPosition(Tile tile, int vertexIndex) {
         Point2D tileCenter = tile.getCenterPosition();
         double angleRad = 2 * Math.PI / 6 * vertexIndex;
@@ -128,53 +135,73 @@ public class Board {
         double y = tileCenter.getY() + Tile.RADIUS * Math.sin(angleRad);
         return new Point2D(x, y);
     }
-
+    private String generateVertexKey(int row, int col, int vertexIndex) {
+        return row + "-" + col + "-" + vertexIndex;
+    }
     private Vertex findOrCreateVertexAt(Tile tile, int vertexIndex) {
-        // Create a unique key based on the tile's position and vertex index
-        String vertexKey = tile.getRow() + "-" + tile.getCol() + "-" + vertexIndex;
+        String vertexKey = generateVertexKey(tile.getRow(), tile.getCol(), vertexIndex);
 
-        // Check if the vertex already exists
         if (vertexMap.containsKey(vertexKey)) {
             return vertexMap.get(vertexKey);
         }
-        Point2D pos =  calculateVertexPosition(tile, vertexIndex);
-        // Create a new vertex if it doesn't exist
-        Vertex newVertex = new Vertex(pos);
+
+        // Calculate the vertex position
+        Point2D position = calculateVertexPosition(tile, vertexIndex);
+
+        // Create a new vertex
+        Vertex newVertex = new Vertex(position, tile.getRow(), tile.getCol(), vertexIndex);
         vertexMap.put(vertexKey, newVertex);
         return newVertex;
     }
 
     private Map<String, Edge> edgeMap = new HashMap<>();
 
-    private Edge findOrCreateEdgeBetween(Tile tile, int vertex1Index, int vertex2Index) {
-        // Create unique keys for the vertices
-        String vertex1Key = tile.getRow() + "-" + tile.getCol() + "-" + vertex1Index;
-        String vertex2Key = tile.getRow() + "-" + tile.getCol() + "-" + vertex2Index;
+    private Edge findOrCreateEdgeBetween(Vertex vertex1, Vertex vertex2) {
+        String vertex1Key = vertex1.getKey(); // Assuming Vertex class has a method to get a unique key
+        String vertex2Key = vertex2.getKey(); // Same as above
 
-        // Create a unique key for the edge
-        String[] edgeVertices = {vertex1Key, vertex2Key};
-        Arrays.sort(edgeVertices); // Ensures the key is the same regardless of vertex order
-        String edgeKey = edgeVertices[0] + "-" + edgeVertices[1];
+        // Create a unique key for the edge based on vertex keys
+        String edgeKey = vertex1Key.compareTo(vertex2Key) < 0 ? vertex1Key + "-" + vertex2Key : vertex2Key + "-" + vertex1Key;
 
-        // Check if the edge already exists
+        // Check if the edge already exists in the map
         if (edgeMap.containsKey(edgeKey)) {
             return edgeMap.get(edgeKey);
         }
 
-        // Create a new edge if it doesn't exist
-        Edge newEdge = new Edge(vertexMap.get(vertex1Key), vertexMap.get(vertex2Key));
+        // Create a new edge if it doesn't exist and add it to the map
+        Edge newEdge = new Edge(vertex1, vertex2);
         edgeMap.put(edgeKey, newEdge);
         return newEdge;
     }
+
     public List<Vertex> getAvailableVertices() {
-        return vertexMap.values().stream()
+        List<Vertex> availableVertices = vertexMap.values().stream()
                 .filter(Vertex::isAvailable)
                 .collect(Collectors.toList());
+        System.out.println("Available vertices: " + availableVertices.size());
+
+        return availableVertices;
     }
 
     public List<Edge> getConnectedAvailableEdges(Vertex vertex) {
         return vertex.getConnectedEdges().stream()
                 .filter(Edge::isAvailable)
                 .collect(Collectors.toList());
+    }
+
+    public boolean addSettlement(Vertex vertex, Settlement settlement) {
+        if (vertex.isAvailable()) {
+            vertex.buildSettlement(settlement);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addRoad(Edge edge, Road road) {
+        if (edge.isAvailable()) {
+            edge.buildRoad(road);
+            return true;
+        }
+        return false;
     }
 }
