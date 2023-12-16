@@ -67,6 +67,7 @@ public class GameClient {
     BorderPane.setAlignment(boardView, Pos.CENTER);
     totalPane.setCenter(boardView);
     HBox bottomContainer = new HBox();
+    bottomContainer.setAlignment(Pos.CENTER);
     GridPane diceContainer = diceComponent.getNewComponent(state);
     diceContainer.add(getRollButton(gameStage), 1, 1);
     bottomContainer.getChildren().addAll(diceContainer, resourcesComponent.getNewComponent(state));

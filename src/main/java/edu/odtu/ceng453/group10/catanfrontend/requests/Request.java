@@ -73,7 +73,7 @@ public class Request {
     }
   }
 
-  public String[] sendLeaderboardRequest(LeaderboardType type){
+  public LeaderboardResponse[] sendLeaderboardRequest(LeaderboardType type){
     String fullUrl = LEADERBOARD_URL;
     switch (type) {
       case LeaderboardType.WEEKLY -> fullUrl += "/weekly";
@@ -82,12 +82,9 @@ public class Request {
     }
 
     RestTemplate restTemplate = new RestTemplate();
-    ResponseEntity<String[]> response = restTemplate.getForEntity(fullUrl, String[].class);
-    HttpStatusCode responseStatus = response.getStatusCode();
-    if(responseStatus != HttpStatus.ACCEPTED) {
-      return null;
-    }
-    return response.getBody();
+    ResponseEntity<LeaderboardResponse[]> response = restTemplate.getForEntity(fullUrl, LeaderboardResponse[].class);
+    LeaderboardResponse[] responseBody = response.getBody();
+    return responseBody;
   }
 
   public boolean sendResetRequest(String email, String password) {
