@@ -66,17 +66,17 @@ public class GameClient {
     BorderPane totalPane = new BorderPane();
     BorderPane.setAlignment(boardView, Pos.CENTER);
     totalPane.setCenter(boardView);
-    HBox bottomContainer = new HBox();
+    HBox bottomContainer = new HBox(250);
     bottomContainer.setAlignment(Pos.CENTER);
     GridPane diceContainer = diceComponent.getNewComponent(state);
     diceContainer.add(getRollButton(gameStage), 1, 1);
-    bottomContainer.getChildren().addAll(diceContainer, resourcesComponent.getNewComponent(state));
+    bottomContainer.getChildren().addAll(diceContainer, getEndTurnButton(gameStage), resourcesComponent.getNewComponent(state));
     totalPane.setBottom(bottomContainer);
-    VBox rightContainer = new VBox();
+    VBox rightContainer = new VBox(100);
+    rightContainer.setAlignment(Pos.CENTER);
     Text currentTurn = new Text("Current Turn: " + state.getCurrentPlayer().getName());
     rightContainer.getChildren().addAll(currentTurn, scoreboardComponent.getScoreboard(state));
     totalPane.setRight(rightContainer);
-    totalPane.setTop(getEndTurnButton(gameStage));
     Scene gameScene = new Scene(totalPane);
     gameScene.setOnKeyPressed(e -> {
       if(e.getCode() == KeyCode.ESCAPE) {
