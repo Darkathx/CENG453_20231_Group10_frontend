@@ -1,63 +1,82 @@
 package edu.odtu.ceng453.group10.catanfrontend;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
-import javafx.scene.control.Button;
 import org.springframework.stereotype.Component;
 import edu.odtu.ceng453.group10.catanfrontend.game.*;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 @Component
 public class GameController {
-  private Board board;
-  public List<Player> players;
-  private Random random;
+  private static final Logger LOGGER = Logger.getLogger(GameController.class.getName());
 
-  // Call this method at the start of the game to place initial settlements and roads
+  private GameState gameState;
+  private Random random = new Random();
+
+  public GameController(GameState gameState) {
+    this.gameState = gameState;
+    setupInitialBoard();
+  }
+
   public void setupInitialBoard() {
-    for (Player player : players) {
-      // Choose a random vertex for the settlement
-      Vertex settlementVertex = getRandomAvailableVertex();
-      buildSettlement(player, settlementVertex);
+    LOGGER.info("Setting up the initial board.");
 
-      // Choose a random edge connected to the settlement vertex for the road
+    for (Player player : gameState.getPlayers()) {
+      Vertex settlementVertex = getRandomAvailableVertex();
+      Settlement settlement = new Settlement(settlementVertex);
+      settlementVertex.buildSettlement(settlement); // Directly build without checking resources
+      player.getSettlements().add(settlement);
+
+      // Select a random edge connected to the settlement vertex for the initial road
       Edge roadEdge = getRandomAvailableEdge(settlementVertex);
-      buildRoad(player, roadEdge);
+      Road road = new Road(roadEdge);
+      roadEdge.buildRoad(road); // Directly build without checking resources
+      player.getRoads().add(road);
     }
   }
 
-  // Method to allow a player to build a settlement
+
   public boolean buildSettlement(Player player, Vertex vertex) {
-    if (vertex.isAvailable() && player.canBuildSettlement()) {
+    if (vertex.isAvailable()) {
       Settlement settlement = new Settlement(vertex);
-      player.deductResourcesForSettlement();
-      player.addSettlement(settlement);
-      return true;
+      boolean added = gameState.getBoard().addSettlement(vertex, settlement);
+      if(added){
+        player.buildSettlement(settlement);
+      }
+      return added;
     }
     return false;
   }
 
-  // Method to allow a player to build a road
   public boolean buildRoad(Player player, Edge edge) {
-    if (edge.isAvailable() && player.canBuildRoad()) {
+    if (edge.isAvailable()) {
       Road road = new Road(edge);
-      player.deductResourcesForRoad();
-      player.addRoad(road);
-      return true;
+      boolean added = gameState.getBoard().addRoad(edge, road);
+      if(added){
+        player.buildRoad(road);
+      }
+      return added;
     }
     return false;
   }
 
   private Vertex getRandomAvailableVertex() {
-    List<Vertex> availableVertices = board.getAvailableVertices();
+    List<Vertex> availableVertices = gameState.getBoard().getAvailableVertices();
     return availableVertices.get(random.nextInt(availableVertices.size()));
   }
 
   private Edge getRandomAvailableEdge(Vertex vertex) {
-    List<Edge> connectedEdges = board.getConnectedAvailableEdges(vertex);
+    List<Edge> connectedEdges = gameState.getBoard().getConnectedAvailableEdges(vertex);
     return connectedEdges.get(random.nextInt(connectedEdges.size()));
+  }
+  public Player getCurrentPlayer() {
+    return gameState.getPlayers().get(gameState.getCurrentPlayerIndex());
+  }
+  public void nextTurn() {
+    int currentPlayerIndex = gameState.getCurrentPlayerIndex();
+    currentPlayerIndex = (currentPlayerIndex + 1) % gameState.getPlayers().size();
+    gameState.setCurrentPlayerIndex(currentPlayerIndex);
   }
 }

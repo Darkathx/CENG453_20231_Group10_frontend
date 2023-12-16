@@ -4,6 +4,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.geometry.Point2D;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Tile {
@@ -15,6 +16,7 @@ public class Tile {
     private List<Edge> edges;
     private int row;
     private int col;
+    private Point2D center;
     private static final double GAP = 20;
     static final double RADIUS = 50; // radius of the hexagon
     static final double APOTHEM = RADIUS * Math.sqrt(3) / 2; // distance from center to mid-edge
@@ -22,17 +24,11 @@ public class Tile {
 
     public Point2D getCenterPosition() {
         // Calculate the x and y position based on row and column
-        double x = col * (RADIUS * 1.5 + GAP);
-        double y = row * (2 * APOTHEM);
-
-        // Offset every other row
-        if (row % 2 != 0) {
-            x += RADIUS * 3 / 4;
-        }
-
-        return new Point2D(x, y);
+        return this.center;
     }
-
+    public void setCenter(Point2D center){
+        this.center = center;
+    }
     public Tile(TileType tileType, ResourceType resourceType, Integer number, int row, int col) {
         this.tileType = tileType;
         this.resourceType = resourceType; // This can be null if tileType is DESERT
@@ -40,6 +36,8 @@ public class Tile {
         this.hexagon = createHexagon();
         this.row = row;
         this.col = col;
+        this.vertices = new ArrayList<>();
+        this.edges = new ArrayList<>();
     }
 
     private Polygon createHexagon() {
@@ -130,5 +128,13 @@ public class Tile {
     }
     public int setCol(int col){
         return this.col = col;
+    }
+    public void addVertex(Vertex vertex) {
+        this.vertices.add(vertex);
+    }
+
+    // Method to add an edge to this tile
+    public void addEdge(Edge edge) {
+        this.edges.add(edge);
     }
 }

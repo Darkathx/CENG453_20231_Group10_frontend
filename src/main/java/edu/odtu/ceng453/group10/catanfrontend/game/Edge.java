@@ -21,7 +21,9 @@ public class Edge {
     public void setVertex1(Vertex vertex1) {
         this.vertex1 = vertex1;
     }
-
+    public boolean involves(Vertex vertex) {
+        return vertex.equals(vertex1) || vertex.equals(vertex2);
+    }
     public Vertex getVertex2() {
         return vertex2;
     }
@@ -43,5 +45,12 @@ public class Edge {
 
     public boolean isConnectedTo(Vertex vertex) {
         return vertex.equals(vertex1) || vertex.equals(vertex2);
+    }
+    public boolean buildRoad(Road road){
+        if(this.road == null){
+            this.road = road;
+            return true;
+        }
+        return false;
     }
 }
