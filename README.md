@@ -7,6 +7,7 @@ This module consists of the implentations for client-side development of desktop
 
 ## Used Libraries
 - Spring Web
+- JavaFX
 
 ## Getting Started
 
