@@ -6,6 +6,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.geometry.Point2D;
@@ -39,6 +40,10 @@ public class BoardView extends Pane {
                 Text numberText = createNumberText(tile);
                 this.getChildren().add(numberText);
             }
+            if (tile.getTileType() != null) {
+                Text tileText = createTileTypeText(tile);
+                this.getChildren().add(tileText);
+            }
         }
     }
 
@@ -48,6 +53,15 @@ public class BoardView extends Pane {
         numberText.setTextAlignment(TextAlignment.CENTER);
         numberText.setTranslateX(center.getX());
         numberText.setTranslateY(center.getY());
+        return numberText;
+    }
+    private Text createTileTypeText(Tile tile) {
+        Point2D center = tile.getCenterPosition();
+        Text numberText = new Text(tile.getTileType().toString());
+        numberText.setTextAlignment(TextAlignment.LEFT);
+        numberText.setFont(Font.font(9));
+        numberText.setTranslateX(center.getX()-RADIUS/6);
+        numberText.setTranslateY(center.getY()-RADIUS/4);
         return numberText;
     }
 
