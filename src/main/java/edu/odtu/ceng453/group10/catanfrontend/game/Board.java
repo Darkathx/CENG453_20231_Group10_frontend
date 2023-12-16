@@ -19,6 +19,7 @@ public class Board {
     private static final double GAP = 20; // Gap between tiles
     private final int[] rowLengths = {3, 4, 5, 4, 3}; // Hexagons per row
     private Map<String, Vertex> vertexMap = new HashMap<>();
+    private Map<String, Edge> edgeMap = new HashMap<>();
 
 
     public Board() {
@@ -63,6 +64,8 @@ public class Board {
                 double y = startY + row * (APOTHEM * 2);
                 Point2D center = new Point2D(x + RADIUS, y + RADIUS);
                 tile.setCenter(center);
+                tile.setCol(col);
+                tile.setRow(row);
                 tile.getHexagon().setTranslateX(x);
                 tile.getHexagon().setTranslateY(y);
             }
@@ -136,7 +139,7 @@ public class Board {
     }
     private Point2D calculateVertexPosition(Tile tile, int vertexIndex) {
         Point2D tileCenter = tile.getCenterPosition();
-        double angleRad = 2 * Math.PI / 6 * vertexIndex;
+        double angleRad = vertexIndex*2 * Math.PI / 6 +Math.PI/6;
         double x = tileCenter.getX() + Tile.RADIUS * Math.cos(angleRad);
         double y = tileCenter.getY() + Tile.RADIUS * Math.sin(angleRad);
         return new Point2D(x, y);
@@ -145,8 +148,9 @@ public class Board {
         return row + "-" + col + "-" + vertexIndex;
     }
     private Vertex findOrCreateVertexAt(Tile tile, int vertexIndex) {
+        LOGGER.info("Find or create func" + tile.getNumber());
         String vertexKey = generateVertexKey(tile.getRow(), tile.getCol(), vertexIndex);
-
+        LOGGER.info("Vertex key with index " + vertexIndex + " " + vertexKey);
         if (vertexMap.containsKey(vertexKey)) {
             return vertexMap.get(vertexKey);
         }
@@ -159,8 +163,6 @@ public class Board {
         vertexMap.put(vertexKey, newVertex);
         return newVertex;
     }
-
-    private Map<String, Edge> edgeMap = new HashMap<>();
 
     private Edge findOrCreateEdgeBetween(Vertex vertex1, Vertex vertex2) {
         String vertex1Key = vertex1.getKey(); // Assuming Vertex class has a method to get a unique key
@@ -184,7 +186,7 @@ public class Board {
         List<Vertex> availableVertices = vertexMap.values().stream()
                 .filter(Vertex::isAvailable)
                 .collect(Collectors.toList());
-        System.out.println("Available vertices: " + availableVertices.size());
+        LOGGER.info("Available vertices: " + availableVertices.size() + vertexMap);
 
         return availableVertices;
     }
