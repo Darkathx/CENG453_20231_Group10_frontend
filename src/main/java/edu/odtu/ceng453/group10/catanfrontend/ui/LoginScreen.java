@@ -74,7 +74,7 @@ public class LoginScreen {
         errorAlert.showAndWait();
       }
       else {
-        client.setEmailAndUsername(response.email(), response.username());
+        client.setUsername(response.username());
         primaryStage.setScene(playScreen.getScene(primaryStage));
       }
     });

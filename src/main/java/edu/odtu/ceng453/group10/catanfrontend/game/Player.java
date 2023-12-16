@@ -9,12 +9,14 @@ public class Player {
     private ResourceCardDeck resourceCards;
     public List<Settlement> settlements;
     public List<Road> roads;
+    private int points;
 
     public Player(String name, ResourceCardDeck resourceCards) {
         this.name = name;
         this.resourceCards = resourceCards;
         this.settlements = new ArrayList<>();
         this.roads = new ArrayList<>();
+        this.points = 0;
     }
 
     // Getters and setters
@@ -24,6 +26,15 @@ public class Player {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public int addPoints(int points) {
+        this.points += points;
+        return this.points;
     }
 
     public ResourceCardDeck getResources() {

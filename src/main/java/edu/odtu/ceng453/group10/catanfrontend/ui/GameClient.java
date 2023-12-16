@@ -9,6 +9,9 @@ import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.springframework.stereotype.Component;
 import edu.odtu.ceng453.group10.catanfrontend.game.Board;
@@ -16,31 +19,48 @@ import edu.odtu.ceng453.group10.catanfrontend.game.Tile;
 
 @Component
 public class GameClient {
-  private String email;
   private String username;
   private Board board;
   private BoardView boardView;
-  private String[] usernames;
   private GameState state;
+  private ResourcesComponent resourcesComponent;
+  private ScoreboardComponent scoreboardComponent;
+  private DiceComponent diceComponent;
 
-  public GameClient(GameState state) {
+  public GameClient(GameState state, DiceComponent diceComponent,
+          ResourcesComponent resourcesComponent, ScoreboardComponent scoreboardComponent) {
     this.state = state;
     this.board = state.getBoard(); // Get the board from the GameState
     this.boardView = new BoardView(board.getTiles().toArray(new Tile[0])); // Create BoardView
-
+    this.diceComponent = diceComponent;
+    this.resourcesComponent = resourcesComponent;
+    this.scoreboardComponent = scoreboardComponent;
   }
 
-  public void setEmailAndUsername(String email, String username) {
-    this.email = email;
+  public void setUsername(String username) {
     this.username = username;
+  }
+
+  public void playSingleGame(Stage stage) {
+    state.initializeSingleGame(username);
+    stage.setScene(getGameScene(stage));
   }
 
   public Scene getGameScene(Stage gameStage) {
     BorderPane totalPane = new BorderPane();
     BorderPane.setAlignment(boardView, Pos.CENTER);
     totalPane.setCenter(boardView);
+    HBox bottomContainer = new HBox();
+    GridPane diceContainer = diceComponent.getNewComponent(state);
+    diceContainer.add(getRollButton(gameStage), 1, 1);
+    bottomContainer.getChildren().addAll(diceContainer, resourcesComponent.getNewComponent(state));
+    totalPane.setBottom(bottomContainer);
+    VBox rightContainer = new VBox();
+    Text currentTurn = new Text("Current Turn: " + state.getCurrentPlayer().getName());
+    rightContainer.getChildren().addAll(currentTurn, scoreboardComponent.getScoreboard(state));
+    totalPane.setRight(rightContainer);
+    totalPane.setTop(getEndTurnButton(gameStage));
     Scene gameScene = new Scene(totalPane);
-    prepareGameScene(state, totalPane);
     gameScene.setOnKeyPressed(e -> {
       if(e.getCode() == KeyCode.ESCAPE) {
         gameStage.setScene(getEscScene(gameStage));
@@ -53,8 +73,37 @@ public class GameClient {
     return boardView;
   }
 
-  private void prepareGameScene(GameState state, BorderPane pane) {
+  private Button getRollButton(Stage stage) {
+    Button rollButton = new Button("Roll Dice");
+    rollButton.setOnAction(e -> {
+      int[] dice = diceComponent.rollDice();
+      state.setLastDiceRoll(dice);
+      //TODO: distribute resources
+      stage.setScene(getGameScene(stage));
+    });
+    if(state.getCurrentPlayer().getName().equals(state.getPlayers().get(0).getName())) {
+      rollButton.setDisable(false);
+    }
+    else {
+      rollButton.setDisable(true);
+    }
+    return rollButton;
+  }
 
+  private Button getEndTurnButton(Stage stage) {
+    Button endTurnButton = new Button("End Turn");
+    endTurnButton.setOnAction(e -> {
+      state.setCurrentPlayerIndex((state.getCurrentPlayerIndex() + 1) % state.getPlayers().size());
+      stage.setScene(getGameScene(stage));
+      //TODO: AI PLAYS HERE
+    });
+    if(state.getCurrentPlayer().getName().equals(state.getPlayers().get(0).getName()) && state.getDiceRolled()) {
+      endTurnButton.setDisable(false);
+    }
+    else {
+      endTurnButton.setDisable(true);
+    }
+    return endTurnButton;
   }
 
   private Scene getEscScene(Stage gameStage) {
