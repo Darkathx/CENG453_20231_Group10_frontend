@@ -75,7 +75,9 @@ public class LoginScreen {
       logger.info("Login tried"); // Log a warning message
       String email = emailField.getText();
       String password = passwordField.getText();
+      logger.info("Request is sending"); // Log a warning message
       Request loginRequest = new Request();
+      logger.info("Requested"); // Log a warning message
 
       LoginResponse response = loginRequest.sendLoginRequest(email, password);
       if (response.email().isEmpty()) {

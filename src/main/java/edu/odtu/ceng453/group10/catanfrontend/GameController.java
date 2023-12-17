@@ -28,6 +28,7 @@ public class GameController {
       Settlement settlement = new Settlement(settlementVertex);
       settlementVertex.buildSettlement(settlement); // Directly build without checking resources
       player.getSettlements().add(settlement);
+      player.addResourceForSettlement(settlement);
 
       // Select a random edge connected to the settlement vertex for the initial road
       Edge roadEdge = getRandomAvailableEdge(settlementVertex);

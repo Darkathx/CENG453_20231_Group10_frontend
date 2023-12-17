@@ -38,6 +38,4 @@ public class ResourceCardDeck {
     public int getResourceCount(ResourceType type) {
         return resources.getOrDefault(type, 0);
     }
-
-    // ... additional methods as needed ...
 }

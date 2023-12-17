@@ -117,7 +117,6 @@ public class Board {
                 Vertex vertex1 = findOrCreateVertexAt(tile, i);
                 Vertex vertex2 = findOrCreateVertexAt(tile, (i + 1) % 6);
                 Edge edge = findOrCreateEdgeBetween(vertex1, vertex2);
-
                 tile.addVertex(vertex1);
                 tile.addEdge(edge);
 
@@ -125,6 +124,19 @@ public class Board {
                 vertex1.addConnectedEdge(edge);
                 vertex2.addConnectedEdge(edge);
             }
+        }
+        for (Tile tile : tiles) {
+            List<Vertex> verticesOfTile = new ArrayList<>();
+            for (int i = 0; i < 6; i++) {
+                Vertex vertex = findOrCreateVertexAt(tile, i);
+                verticesOfTile.add(vertex);
+            }
+            associateVerticesWithTile(verticesOfTile, tile);
+        }
+    }
+    private void associateVerticesWithTile(List<Vertex> vertices, Tile tile) {
+        for (Vertex vertex : vertices) {
+            vertex.addAdjacentTile(tile);
         }
     }
 
@@ -148,21 +160,21 @@ public class Board {
         return row + "-" + col + "-" + vertexIndex;
     }
     private Vertex findOrCreateVertexAt(Tile tile, int vertexIndex) {
-        LOGGER.info("Find or create func" + tile.getNumber());
         String vertexKey = generateVertexKey(tile.getRow(), tile.getCol(), vertexIndex);
-        LOGGER.info("Vertex key with index " + vertexIndex + " " + vertexKey);
+
         if (vertexMap.containsKey(vertexKey)) {
-            return vertexMap.get(vertexKey);
+            Vertex existingVertex = vertexMap.get(vertexKey);
+            existingVertex.addAdjacentTile(tile);
+            return existingVertex;
+        } else {
+            Point2D position = calculateVertexPosition(tile, vertexIndex);
+            Vertex newVertex = new Vertex(position, tile.getRow(), tile.getCol(), vertexIndex);
+            newVertex.addAdjacentTile(tile);
+            vertexMap.put(vertexKey, newVertex);
+            return newVertex;
         }
-
-        // Calculate the vertex position
-        Point2D position = calculateVertexPosition(tile, vertexIndex);
-
-        // Create a new vertex
-        Vertex newVertex = new Vertex(position, tile.getRow(), tile.getCol(), vertexIndex);
-        vertexMap.put(vertexKey, newVertex);
-        return newVertex;
     }
+
 
     private Edge findOrCreateEdgeBetween(Vertex vertex1, Vertex vertex2) {
         String vertex1Key = vertex1.getKey(); // Assuming Vertex class has a method to get a unique key
@@ -186,7 +198,6 @@ public class Board {
         List<Vertex> availableVertices = vertexMap.values().stream()
                 .filter(Vertex::isAvailable)
                 .collect(Collectors.toList());
-        LOGGER.info("Available vertices: " + availableVertices.size() + vertexMap);
 
         return availableVertices;
     }

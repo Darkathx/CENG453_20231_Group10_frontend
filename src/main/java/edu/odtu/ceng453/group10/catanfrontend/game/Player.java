@@ -57,10 +57,16 @@ public class Player {
     public void setResources(ResourceCardDeck resources) {
         this.resourceCards = resources;
     }
+    public void addResourceForSettlement(Settlement settlement){
+        Set<Tile> adjacentTiles = settlement.getLocation().getAdjacentTiles();
+        for(Tile tile: adjacentTiles){
+            if(tile.getResourceType() != null){
+                resourceCards.addResource(tile.getResourceType(),1);
+            }
+        }
+    }
 
     public List<Settlement> getSettlements() {
-        LOGGER.info("Get sttlements to add" + this.settlements);
-
         return settlements;
     }
 
