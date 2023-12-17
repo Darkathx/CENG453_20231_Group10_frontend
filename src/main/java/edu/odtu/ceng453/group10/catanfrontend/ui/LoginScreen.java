@@ -4,6 +4,7 @@ import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
 import edu.odtu.ceng453.group10.catanfrontend.requests.LoginResponse;
 import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
 import java.util.Set;
+import java.util.logging.Logger; // Import the Logger class
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -22,6 +23,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoginScreen {
 
+  private static final Logger logger = Logger.getLogger(LoginScreen.class.getName()); // Create a logger instance for the class
+
   private final GameClient client;
   private Scene mainScene;
   private final PlayScreen playScreen;
@@ -38,7 +41,10 @@ public class LoginScreen {
   public Scene getScene(Stage primaryStage) {
 
     Button backButton = new Button("Back");
-    backButton.setOnAction(e -> primaryStage.setScene(mainScene));
+    backButton.setOnAction(e -> {
+      primaryStage.setScene(mainScene);
+      logger.info("Back button clicked."); // Log an info message
+    });
 
     GridPane loginPane = new GridPane();
     Label emailLabel = new Label("Email: ");
@@ -56,26 +62,35 @@ public class LoginScreen {
     loginPane.setHgap(5.5);
     loginPane.setVgap(5.5);
     loginPane.setAlignment(Pos.CENTER);
+
+    logger.info("Login screen created."); // Log an info message
+
     return new Scene(loginPane, Settings.getWidth(), Settings.getHeight());
   }
 
   private Button getLoginButton(Stage primaryStage, TextField emailField,
-      PasswordField passwordField) {
+                                PasswordField passwordField) {
     Button loginButton = new Button("Login");
     loginButton.setOnAction(e -> {
+      logger.info("Login tried"); // Log a warning message
       String email = emailField.getText();
       String password = passwordField.getText();
+      logger.info("Request is sending"); // Log a warning message
       Request loginRequest = new Request();
+      logger.info("Requested"); // Log a warning message
+
       LoginResponse response = loginRequest.sendLoginRequest(email, password);
-      if(response.email().isEmpty()) {
+      if (response.email().isEmpty()) {
+        logger.info("Login failed for email" + email);
         Alert errorAlert = new Alert(AlertType.ERROR);
         errorAlert.setHeaderText("Warning");
         errorAlert.setContentText("Wrong email/password.");
         errorAlert.showAndWait();
-      }
-      else {
+      } else {
+        logger.info("login is ok");
         client.setUsername(response.username());
         primaryStage.setScene(playScreen.getScene(primaryStage));
+        logger.info("User logged in: " + response.username()); // Log an info message
       }
     });
     return loginButton;

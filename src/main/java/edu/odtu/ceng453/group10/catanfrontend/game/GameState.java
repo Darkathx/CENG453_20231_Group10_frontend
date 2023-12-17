@@ -67,8 +67,7 @@ public class GameState {
         return players.get(currentPlayerIndex);
     }
     public static final Color[] PLAYER_COLORS = {
-            Color.RED, Color.BLUE, Color.GREEN, Color.ORANGE, Color.PURPLE, Color.BROWN
-            // Add more colors as needed
+            Color.RED, Color.BLUE, Color.PURPLE, Color.BLACK
     };
     public void initializeSingleGame(String username) {
         players.add(new Player(username, new ResourceCardDeck(), PLAYER_COLORS[0]));

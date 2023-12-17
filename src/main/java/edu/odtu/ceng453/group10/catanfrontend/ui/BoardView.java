@@ -6,6 +6,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.geometry.Point2D;
@@ -39,6 +40,10 @@ public class BoardView extends Pane {
                 Text numberText = createNumberText(tile);
                 this.getChildren().add(numberText);
             }
+            if (tile.getTileType() != null) {
+                Text tileText = createTileTypeText(tile);
+                this.getChildren().add(tileText);
+            }
         }
     }
 
@@ -50,25 +55,36 @@ public class BoardView extends Pane {
         numberText.setTranslateY(center.getY());
         return numberText;
     }
+    private Text createTileTypeText(Tile tile) {
+        Point2D center = tile.getCenterPosition();
+        Text numberText = new Text(tile.getTileType().toString());
+        numberText.setTextAlignment(TextAlignment.LEFT);
+        numberText.setFont(Font.font(9));
+        numberText.setTranslateX(center.getX()-RADIUS/6);
+        numberText.setTranslateY(center.getY()-RADIUS/4);
+        return numberText;
+    }
 
     public void drawInteractiveComponents(GameState gameState) {
         // Draw available settlements and roads
-        gameState.getBoard().getAvailableVertices().forEach(vertex -> drawVertex(vertex));
-        gameState.getBoard().getTiles().forEach(tile -> tile.getEdges().forEach(this::drawEdge));
+        for(Player player : gameState.getPlayers()){
+            drawEdge(player.getRoads().getFirst().getLocation(), player);
+            drawVertex(player.getSettlements().getFirst().getLocation(), player);
+        }
     }
 
-    private void drawVertex(Vertex vertex) {
-        Circle vertexGraphic = new Circle(vertex.getPosition().getX(), vertex.getPosition().getY(), VERTEX_RADIUS, Color.TRANSPARENT);
-        vertexGraphic.setStroke(Color.BLACK);
+    private void drawVertex(Vertex vertex, Player player) {
+        Circle vertexGraphic = new Circle(vertex.getPosition().getX(), vertex.getPosition().getY(), VERTEX_RADIUS, player.getPlayerColor());
+        vertexGraphic.setStroke(player.getPlayerColor());
         vertexGraphic.setOnMouseClicked(event -> handleVertexClick(vertex));
         this.getChildren().add(vertexGraphic);
     }
 
-    private void drawEdge(Edge edge) {
+    private void drawEdge(Edge edge, Player player) {
         Line edgeGraphic = new Line(edge.getVertex1().getPosition().getX(), edge.getVertex1().getPosition().getY(),
                 edge.getVertex2().getPosition().getX(), edge.getVertex2().getPosition().getY());
-        edgeGraphic.setStroke(Color.TRANSPARENT);
-        edgeGraphic.setStrokeWidth(EDGE_STROKE_WIDTH);
+        edgeGraphic.setStroke(player.getPlayerColor());
+        edgeGraphic.setStrokeWidth(EDGE_STROKE_WIDTH/2);
         edgeGraphic.setOnMouseClicked(event -> handleEdgeClick(edge));
         this.getChildren().add(edgeGraphic);
     }

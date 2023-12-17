@@ -1,5 +1,8 @@
 package edu.odtu.ceng453.group10.catanfrontend.game;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Edge {
     private Vertex vertex1;
     private Vertex vertex2;
@@ -52,5 +55,15 @@ public class Edge {
             return true;
         }
         return false;
+    }
+    public List<Tile> getAdjacentTiles() {
+        List<Tile> adjacentTiles = new ArrayList<>();
+        if (vertex1 != null) {
+            adjacentTiles.addAll(vertex1.getAdjacentTiles());
+        }
+        if (vertex2 != null) {
+            adjacentTiles.addAll(vertex2.getAdjacentTiles());
+        }
+        return adjacentTiles;
     }
 }

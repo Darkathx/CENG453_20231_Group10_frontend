@@ -3,7 +3,9 @@ package edu.odtu.ceng453.group10.catanfrontend.game;
 import edu.odtu.ceng453.group10.catanfrontend.GameController;
 import javafx.geometry.Point2D;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class Vertex {
@@ -14,14 +16,17 @@ public class Vertex {
     private Player owner;
     private String key;
     private List<Edge> connectedEdges;
+    private Set<Tile> adjacentTiles;
 
     public Vertex(Point2D position, int row, int col, int vertexIndex) {
         this.position = position;
         this.settlement = null;
         this.owner = null;
         this.connectedEdges = new ArrayList<>();
+        this.adjacentTiles = new HashSet<>();
         this.key = generateKey(row, col, vertexIndex);
     }
+
 
     // Method to add a connected edge
     public void addConnectedEdge(Edge edge) {
@@ -67,10 +72,18 @@ public class Vertex {
 
     public boolean buildSettlement(Settlement settlement){
         if(this.settlement == null){
-            LOGGER.info("Build settlement" + this);
             this.settlement = settlement;
             return true;
         }
         return false;
+    }
+    public void addAdjacentTile(Tile tile) {
+        adjacentTiles.add(tile);
+        LOGGER.info("Vertex at " + position + " now has " + adjacentTiles.size() + " adjacent tiles.");
+
+    }
+    public Set<Tile> getAdjacentTiles() {
+        LOGGER.info("get adjacent tile: " + adjacentTiles);
+        return this.adjacentTiles;
     }
 }
