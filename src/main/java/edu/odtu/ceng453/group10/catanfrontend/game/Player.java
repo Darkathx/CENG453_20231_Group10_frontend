@@ -66,6 +66,28 @@ public class Player {
         }
     }
 
+    public void addResourceForCity(Settlement settlement){ // TODO: change settlement with city
+        Set<Tile> adjacentTiles = settlement.getLocation().getAdjacentTiles();
+        for(Tile tile: adjacentTiles){
+            if(tile.getResourceType() != null){
+                resourceCards.addResource(tile.getResourceType(),2);
+            }
+        }
+    }
+
+    public void addResourcesAccordingToDiceRoll(int diceRoll){
+        for(Settlement settlement: settlements){
+            for(Tile tile: settlement.getLocation().getAdjacentTiles()){
+                if(tile.getNumber() == diceRoll){
+                    if(settlement.isCity())
+                        resourceCards.addResource(tile.getResourceType(),2);
+                    else
+                        resourceCards.addResource(tile.getResourceType(),1);
+                }
+            }
+        }
+    }
+
     public List<Settlement> getSettlements() {
         return settlements;
     }
