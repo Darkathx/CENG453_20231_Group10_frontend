@@ -97,6 +97,9 @@ public class GameClient {
       int[] dice = diceComponent.rollDice();
       state.setLastDiceRoll(dice);
       // Logic to distribute resources based on dice roll
+      for(Player player : state.getPlayers()) {
+        player.addResourcesAccordingToDiceRoll(dice[0] + dice[1]);
+      }
       // Refresh the game scene to reflect changes
       stage.setScene(getGameScene(stage));
     });
