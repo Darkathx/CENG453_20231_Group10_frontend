@@ -76,6 +76,9 @@ public class Player {
     }
 
     public void addResourcesAccordingToDiceRoll(int diceRoll){
+        if(diceRoll == 7){
+            return;
+        }
         for(Settlement settlement: settlements){
             for(Tile tile: settlement.getLocation().getAdjacentTiles()){
                 if(tile.getNumber() == diceRoll){
@@ -130,6 +133,20 @@ public class Player {
             return true;
         }
         return false;
+    }
+
+    public boolean buildCity(Settlement settlement) {
+        if (settlement.getLocation().isAvailable() && canBuildCity()) {
+            settlement.setCity();
+            resourceCards.deduct(Settlement.CITY_COST);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean canBuildCity() {
+        // Example resource check; details depend on ResourceCardDeck implementation
+        return resourceCards.canDeduct(Settlement.CITY_COST);
     }
     public void deductResourcesForRoad() {
         if (canBuildRoad()) {

@@ -13,6 +13,11 @@ public class Settlement {
             ResourceType.WOOL, 1
     );
 
+    public static final Map<ResourceType, Integer> CITY_COST = Map.of(
+            ResourceType.GRAIN, 2,
+            ResourceType.ORE, 3
+    );
+
     public boolean isCity() {
         return isCity;
     }

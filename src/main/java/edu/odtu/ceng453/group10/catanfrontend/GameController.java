@@ -51,6 +51,13 @@ public class GameController {
     return false;
   }
 
+  public boolean buildCity(Player player, Vertex vertex) {
+    if (!vertex.isAvailable() && vertex.getOwner() == player) {
+      return player.buildCity(vertex.getSettlement());
+    }
+    return false;
+  }
+
   public boolean buildRoad(Player player, Edge edge) {
     if (edge.isAvailable()) {
       Road road = new Road(edge);
