@@ -32,9 +32,10 @@ public class GameClient {
   private DiceComponent diceComponent;
 
   public GameClient(GameState gameState, DiceComponent diceComponent,
-                    ResourcesComponent resourcesComponent, ScoreboardComponent scoreboardComponent) {
+                    ResourcesComponent resourcesComponent, ScoreboardComponent scoreboardComponent,
+      GameController gameController) {
     this.state = gameState;
-    this.gameController = new GameController(gameState);
+    this.gameController = gameController;
     this.diceComponent = diceComponent;
     this.resourcesComponent = resourcesComponent;
     this.scoreboardComponent = scoreboardComponent;
@@ -47,7 +48,6 @@ public class GameClient {
 
   public void playSingleGame(Stage stage) {
     state.initializeSingleGame(username);
-    gameController.setupInitialBoard();
     boardView.updateBoardView(state);
     stage.setScene(getGameScene(stage));
   }
@@ -67,17 +67,20 @@ public class GameClient {
     BorderPane totalPane = new BorderPane();
     BorderPane.setAlignment(boardView, Pos.CENTER);
     totalPane.setCenter(boardView);
+
     HBox bottomContainer = new HBox(250);
     bottomContainer.setAlignment(Pos.CENTER);
     GridPane diceContainer = diceComponent.getNewComponent(state);
     diceContainer.add(getRollButton(gameStage), 1, 1);
     bottomContainer.getChildren().addAll(diceContainer, getEndTurnButton(gameStage), resourcesComponent.getNewComponent(state));
     totalPane.setBottom(bottomContainer);
+
     VBox rightContainer = new VBox(100);
     rightContainer.setAlignment(Pos.CENTER);
     Text currentTurn = new Text("Current Turn: " + state.getCurrentPlayer().getName());
     rightContainer.getChildren().addAll(currentTurn, scoreboardComponent.getScoreboard(state));
     totalPane.setRight(rightContainer);
+
     Scene gameScene = new Scene(totalPane);
     gameScene.setOnKeyPressed(e -> {
       if(e.getCode() == KeyCode.ESCAPE) {
@@ -94,6 +97,9 @@ public class GameClient {
       int[] dice = diceComponent.rollDice();
       state.setLastDiceRoll(dice);
       // Logic to distribute resources based on dice roll
+      for(Player player : state.getPlayers()) {
+        player.addResourcesAccordingToDiceRoll(dice[0] + dice[1]);
+      }
       // Refresh the game scene to reflect changes
       stage.setScene(getGameScene(stage));
     });
