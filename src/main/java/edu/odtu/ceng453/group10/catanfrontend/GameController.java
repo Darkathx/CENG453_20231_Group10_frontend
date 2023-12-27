@@ -17,7 +17,6 @@ public class GameController {
 
   public GameController(GameState gameState) {
     this.gameState = gameState;
-    setupInitialBoard();
   }
 
   public void setupInitialBoard() {
@@ -80,4 +79,5 @@ public class GameController {
     currentPlayerIndex = (currentPlayerIndex + 1) % gameState.getPlayers().size();
     gameState.setCurrentPlayerIndex(currentPlayerIndex);
   }
+
 }

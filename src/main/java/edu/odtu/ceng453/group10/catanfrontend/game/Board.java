@@ -14,9 +14,6 @@ public class Board {
     private static List<Tile> tiles;
     private static final Logger LOGGER = Logger.getLogger(Board.class.getName());
 
-    private static final double RADIUS = 50; // Tile radius
-    private static final double APOTHEM = RADIUS * Math.sqrt(3) / 2; // Height from center to side
-    private static final double GAP = 20; // Gap between tiles
     private final int[] rowLengths = {3, 4, 5, 4, 3}; // Hexagons per row
     private Map<String, Vertex> vertexMap = new HashMap<>();
     private Map<String, Edge> edgeMap = new HashMap<>();
@@ -25,6 +22,7 @@ public class Board {
     public Board() {
         tiles = initializeTiles();
         initializeNetwork();
+        LOGGER.info("Number of vertices: " + vertexMap.size());
     }
     private List<Tile> initializeTiles() {
         List<Tile> tilesList = new ArrayList<>();
@@ -51,18 +49,18 @@ public class Board {
 
     private void setTilePositions(List<Tile> tilesList) {
         // Set positions of tiles based on row and column
-        double maxWidth = 5 * (RADIUS * 3 / 2) + (4 * GAP);
-        double totalHeight = 5 * (APOTHEM * 2);
+        double maxWidth = 10*tilesList.get(0).getApothem();
+        double totalHeight = 8* tilesList.get(0).getRadius();
         double startY = (Settings.getHeight() - totalHeight) / 2;
         int tileIndex = 0;
         for (int row = 0; row < rowLengths.length; row++) {
-            double currentRowWidth = rowLengths[row] * (RADIUS * 3 / 2) + ((rowLengths[row] - 1) * GAP);
+            double currentRowWidth = rowLengths[row] * (tilesList.get(0).getApothem()*2);
             double startX = (Settings.getWidth() - maxWidth) / 2 + (maxWidth - currentRowWidth) / 2;
             for (int col = 0; col < rowLengths[row]; col++) {
                 Tile tile = tilesList.get(tileIndex++);
-                double x = startX + col * (RADIUS * 3 / 2 + GAP);
-                double y = startY + row * (APOTHEM * 2);
-                Point2D center = new Point2D(x + RADIUS, y + RADIUS);
+                double x = startX + col * tile.getApothem()*2;
+                double y = startY + row * (tile.getRadius() * 3 / 2);
+                Point2D center = new Point2D(x + tile.getRadius(), y + tile.getRadius());
                 tile.setCenter(center);
                 tile.setCol(col);
                 tile.setRow(row);
@@ -125,19 +123,7 @@ public class Board {
                 vertex2.addConnectedEdge(edge);
             }
         }
-        for (Tile tile : tiles) {
-            List<Vertex> verticesOfTile = new ArrayList<>();
-            for (int i = 0; i < 6; i++) {
-                Vertex vertex = findOrCreateVertexAt(tile, i);
-                verticesOfTile.add(vertex);
-            }
-            associateVerticesWithTile(verticesOfTile, tile);
-        }
-    }
-    private void associateVerticesWithTile(List<Vertex> vertices, Tile tile) {
-        for (Vertex vertex : vertices) {
-            vertex.addAdjacentTile(tile);
-        }
+
     }
 
     private void connectVerticesWithEdges() {
@@ -152,16 +138,15 @@ public class Board {
     private Point2D calculateVertexPosition(Tile tile, int vertexIndex) {
         Point2D tileCenter = tile.getCenterPosition();
         double angleRad = vertexIndex*2 * Math.PI / 6 +Math.PI/6;
-        double x = tileCenter.getX() + Tile.RADIUS * Math.cos(angleRad);
-        double y = tileCenter.getY() + Tile.RADIUS * Math.sin(angleRad);
+        double x = tileCenter.getX() + (Tile.RADIUS) * Math.cos(angleRad);
+        double y = tileCenter.getY() + (Tile.RADIUS) * Math.sin(angleRad);
         return new Point2D(x, y);
     }
     private String generateVertexKey(int row, int col, int vertexIndex) {
         return row + "-" + col + "-" + vertexIndex;
     }
     private Vertex findOrCreateVertexAt(Tile tile, int vertexIndex) {
-        String vertexKey = generateVertexKey(tile.getRow(), tile.getCol(), vertexIndex);
-
+        String vertexKey = Math.round((calculateVertexPosition(tile, vertexIndex).getX())) + " " +Math.round((calculateVertexPosition(tile, vertexIndex).getY()));
         if (vertexMap.containsKey(vertexKey)) {
             Vertex existingVertex = vertexMap.get(vertexKey);
             existingVertex.addAdjacentTile(tile);
@@ -170,6 +155,8 @@ public class Board {
             Point2D position = calculateVertexPosition(tile, vertexIndex);
             Vertex newVertex = new Vertex(position, tile.getRow(), tile.getCol(), vertexIndex);
             newVertex.addAdjacentTile(tile);
+            newVertex.setKey(vertexKey);
+            LOGGER.info("Created new vertex: " + newVertex.getKey());
             vertexMap.put(vertexKey, newVertex);
             return newVertex;
         }

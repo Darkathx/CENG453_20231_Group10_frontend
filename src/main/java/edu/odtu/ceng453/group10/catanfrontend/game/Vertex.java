@@ -24,7 +24,6 @@ public class Vertex {
         this.owner = null;
         this.connectedEdges = new ArrayList<>();
         this.adjacentTiles = new HashSet<>();
-        this.key = generateKey(row, col, vertexIndex);
     }
 
 
@@ -39,8 +38,8 @@ public class Vertex {
     public Point2D getPosition() {
         return position;
     }
-    private String generateKey(int row, int col, int vertexIndex) {
-        return row + "-" + col + "-" + vertexIndex;
+    public void setKey(String key) {
+        this.key = key;
     }
     public String getKey() {
         return key;
@@ -79,8 +78,6 @@ public class Vertex {
     }
     public void addAdjacentTile(Tile tile) {
         adjacentTiles.add(tile);
-        LOGGER.info("Vertex at " + position + " now has " + adjacentTiles.size() + " adjacent tiles.");
-
     }
     public Set<Tile> getAdjacentTiles() {
         LOGGER.info("get adjacent tile: " + adjacentTiles);
