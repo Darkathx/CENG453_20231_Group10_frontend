@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import edu.odtu.ceng453.group10.catanfrontend.GameController;
 import javafx.scene.paint.Color;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -14,6 +13,7 @@ public class Player {
     private ResourceCardDeck resourceCards;
     public List<Settlement> settlements;
     public List<Road> roads;
+    public List<City> cities;
     private int points;
     private Color playerColor;
     private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
@@ -125,6 +125,10 @@ public class Player {
         // Example resource check; details depend on ResourceCardDeck implementation
         return resourceCards.canDeduct(Road.COST);
     }
+    public boolean canUpgradeToCity() {
+        // Example resource check; details depend on ResourceCardDeck implementation
+        return resourceCards.canDeduct(City.COST);
+    }
 
     public boolean buildRoad(Road road) {
         if (road.getLocation().isAvailable() && canBuildRoad()) {
@@ -135,27 +139,16 @@ public class Player {
         return false;
     }
 
-    public boolean buildCity(Settlement settlement) {
-        if (settlement.getLocation().isAvailable() && canBuildCity()) {
-            settlement.setCity();
-            resourceCards.deduct(Settlement.CITY_COST);
+    public boolean isAI() {
+        // Example check for an AI player, modify as needed
+        return this.name.startsWith("AI");
+    }
+    public boolean upgradeToCity(Settlement settlement){
+        if(canUpgradeToCity()){
+            settlement.upgradeToCity();
+            resourceCards.deduct(Settlement.COST_CITY);
             return true;
         }
         return false;
-    }
-
-    public boolean canBuildCity() {
-        // Example resource check; details depend on ResourceCardDeck implementation
-        return resourceCards.canDeduct(Settlement.CITY_COST);
-    }
-    public void deductResourcesForRoad() {
-        if (canBuildRoad()) {
-            resourceCards.deduct(Road.COST);
-        }
-    }
-    public void deductResourcesForSettlement() {
-        if (canBuildSettlement()) {
-            resourceCards.deduct(Settlement.COST);
-        }
     }
 }

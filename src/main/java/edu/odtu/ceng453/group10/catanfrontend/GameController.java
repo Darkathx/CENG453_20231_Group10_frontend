@@ -3,6 +3,8 @@ package edu.odtu.ceng453.group10.catanfrontend;
 import javafx.scene.chart.LineChart;
 import org.springframework.stereotype.Component;
 import edu.odtu.ceng453.group10.catanfrontend.game.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -17,7 +19,6 @@ public class GameController {
 
   public GameController(GameState gameState) {
     this.gameState = gameState;
-    setupInitialBoard();
   }
 
   public void setupInitialBoard() {
@@ -26,7 +27,8 @@ public class GameController {
     for (Player player : gameState.getPlayers()) {
       Vertex settlementVertex = getRandomAvailableVertex();
       Settlement settlement = new Settlement(settlementVertex);
-      settlementVertex.buildSettlement(settlement); // Directly build without checking resources
+      settlementVertex.buildSettlement(settlement);
+      settlementVertex.setOwner(player);// Directly build without checking resources
       player.getSettlements().add(settlement);
       player.addResourceForSettlement(settlement);
 
@@ -42,11 +44,10 @@ public class GameController {
   public boolean buildSettlement(Player player, Vertex vertex) {
     if (vertex.isAvailable()) {
       Settlement settlement = new Settlement(vertex);
-      boolean added = gameState.getBoard().addSettlement(vertex, settlement);
-      if(added){
-        player.buildSettlement(settlement);
-      }
-      return added;
+      player.buildSettlement(settlement);
+      vertex.buildSettlement(settlement);
+      vertex.setOwner(player);
+      return true;
     }
     return false;
   }
@@ -61,11 +62,10 @@ public class GameController {
   public boolean buildRoad(Player player, Edge edge) {
     if (edge.isAvailable()) {
       Road road = new Road(edge);
-      boolean added = gameState.getBoard().addRoad(edge, road);
-      if(added){
-        player.buildRoad(road);
-      }
-      return added;
+      player.buildRoad(road);
+      edge.buildRoad(road);
+      edge.setOwner(player);
+      return true;
     }
     return false;
   }
@@ -87,4 +87,118 @@ public class GameController {
     currentPlayerIndex = (currentPlayerIndex + 1) % gameState.getPlayers().size();
     gameState.setCurrentPlayerIndex(currentPlayerIndex);
   }
+  public boolean upgradeSettlementToCity(Player player, Settlement settlement) {
+    return player.upgradeToCity(settlement);
+  }
+
+  public void performCPUTurn() {
+    Player currentPlayer = getCurrentPlayer();
+    if (!currentPlayer.isAI()) {
+      return;
+    }
+
+    LOGGER.info("CPU player's turn: " + currentPlayer.getName());
+
+    // CPU logic goes here
+    // 1. Roll the dice and collect resources
+    int rolledDice = gameState.getLastDiceRoll()[0]+gameState.getLastDiceRoll()[1];
+    distributeResources(rolledDice);
+
+    // 2. Check and perform actions in order of priority
+    if (currentPlayer.canBuildRoad()) {
+      // Build road at a random available position
+      Edge randomEdge = getRandomAvailableEdgeForPlayer(currentPlayer);
+      buildRoad(currentPlayer, randomEdge);
+    }
+
+    if (currentPlayer.canBuildSettlement()) {
+      // Build settlement at a valid location
+      Vertex randomVertex = getRandomAvailableVertexForPlayer(currentPlayer);
+      buildSettlement(currentPlayer, randomVertex);
+    }
+
+    if (currentPlayer.canUpgradeToCity()) {
+      // Upgrade a random settlement to a city
+      Settlement settlementToUpgrade = getRandomSettlement(currentPlayer);
+      upgradeSettlementToCity(currentPlayer, settlementToUpgrade);
+    }
+
+    // End the CPU's turn
+    nextTurn();
+  }
+
+  private int rollDice(Player player) {
+    // Simulate dice roll - this is just a placeholder
+    return random.nextInt(6) + 1 + random.nextInt(6) + 1;
+  }
+  public void distributeResources(int diceRoll) {
+    List<Tile> tiles = gameState.getBoard().getTiles();
+    for (Tile tile : tiles) {
+      LOGGER.info("tile number: " + tile.getNumber());
+      if (tile.getNumber() != null && tile.getNumber() == diceRoll && tile.getResourceType() != null) {
+        distributeResourcesFromTile(tile);
+      }
+    }
+  }
+
+  private void distributeResourcesFromTile(Tile tile) {
+    List<Vertex> vertices = tile.getVertices();
+    for (Vertex vertex : vertices) {
+      if (vertex.hasSettlement() || vertex.hasCity()) {
+        Player owner = vertex.getOwner();
+        if (owner != null) {
+          ResourceType resource = tile.getResourceType();
+          int amount = vertex.hasCity() ? 2 : 1; // Assuming cities yield double resources
+          owner.getResources().addResource(resource, amount);
+        }
+      }
+    }
+  }
+
+
+  private Edge getRandomAvailableEdgeForPlayer(Player player) {
+    List<Edge> availableEdges = new ArrayList<>();
+    for (Road road : player.getRoads()) {
+      for (Edge edge : road.getLocation().getVertex1().getConnectedEdges()) {
+        if (edge.isAvailable()) {
+          availableEdges.add(edge);
+        }
+      }
+    }
+    if (!availableEdges.isEmpty()) {
+      return availableEdges.get(random.nextInt(availableEdges.size()));
+    }
+    return null; // Or handle this case appropriately
+  }
+
+
+  private Vertex getRandomAvailableVertexForPlayer(Player player) {
+    List<Vertex> availableVertices = new ArrayList<>();
+    for (Road road : player.getRoads()) {
+      addVertexIfSuitable(road.getLocation().getVertex1(), availableVertices);
+      addVertexIfSuitable(road.getLocation().getVertex2(), availableVertices);
+    }
+    if (!availableVertices.isEmpty()) {
+      return availableVertices.get(random.nextInt(availableVertices.size()));
+    }
+    return null; // Or handle this case appropriately
+  }
+
+  private void addVertexIfSuitable(Vertex vertex, List<Vertex> availableVertices) {
+    if (vertex.isAvailable()) {
+      availableVertices.add(vertex);
+    }
+  }
+
+
+  private Settlement getRandomSettlement(Player player) {
+    List<Settlement> settlements = player.getSettlements();
+    if (!settlements.isEmpty()) {
+      return settlements.get(random.nextInt(settlements.size()));
+    }
+    return null; // Or handle this case appropriately
+  }
+
+
+
 }

@@ -12,6 +12,10 @@ public class Settlement {
             ResourceType.GRAIN, 1,
             ResourceType.WOOL, 1
     );
+    public static final Map<ResourceType, Integer> COST_CITY = Map.of(
+            ResourceType.GRAIN, 2,
+            ResourceType.ORE, 3
+    );
 
     public static final Map<ResourceType, Integer> CITY_COST = Map.of(
             ResourceType.GRAIN, 2,
@@ -28,6 +32,7 @@ public class Settlement {
 
     public Settlement(Vertex location) {
         this.location = location;
+        this.isCity = false;
     }
 
     public Vertex getLocation(){
@@ -36,5 +41,8 @@ public class Settlement {
 
     public void setLocation(Vertex location){
         this.location = location;
+    }
+    public void upgradeToCity(){
+        this.isCity = true;
     }
 }
