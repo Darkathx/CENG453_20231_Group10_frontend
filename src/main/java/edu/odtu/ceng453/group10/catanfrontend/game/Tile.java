@@ -20,8 +20,8 @@ public class Tile {
     private int col;
     private Point2D center;
     private static final double GAP = 20;
-    static final double RADIUS = 50; // radius of the hexagon
-    static final double APOTHEM = RADIUS * Math.sqrt(3) / 2; // distance from center to mid-edge
+    public static final double RADIUS = 70; // radius of the hexagon
+    public static final double APOTHEM = RADIUS * Math.sqrt(3) / 2; // distance from center to mid-edge
 
 
     public Point2D getCenterPosition() {
@@ -44,11 +44,10 @@ public class Tile {
 
     private Polygon createHexagon() {
         Polygon hex = new Polygon();
-        double radius = 50; // example size
         for (int i = 0; i < 6; i++) {
             hex.getPoints().addAll(
-                    radius * Math.cos(i * 2 * Math.PI / 6 + Math.PI / 6) + radius,
-                    radius * Math.sin(i * 2 * Math.PI / 6 + Math.PI / 6) + radius
+                    RADIUS * Math.cos(i * 2 * Math.PI / 6 + Math.PI / 6) + RADIUS,
+                    RADIUS * Math.sin(i * 2 * Math.PI / 6 + Math.PI / 6) + RADIUS
             );
 
         }
@@ -138,5 +137,11 @@ public class Tile {
     // Method to add an edge to this tile
     public void addEdge(Edge edge) {
         this.edges.add(edge);
+    }
+    public double getRadius(){
+        return RADIUS;
+    }
+    public double getApothem(){
+        return APOTHEM;
     }
 }

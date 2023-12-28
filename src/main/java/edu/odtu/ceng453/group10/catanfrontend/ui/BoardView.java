@@ -15,9 +15,6 @@ import edu.odtu.ceng453.group10.catanfrontend.GameController;
 import java.util.List;
 
 public class BoardView extends Pane {
-    private static final double RADIUS = 50;
-    private static final double APOTHEM = RADIUS * Math.sqrt(3) / 2;
-    private static final double GAP = 20;
     private static final int[] rowLengths = {3, 4, 5, 4, 3};
     private static final double VERTEX_RADIUS = 15;
     private static final double EDGE_STROKE_WIDTH = 10;
@@ -60,8 +57,8 @@ public class BoardView extends Pane {
         Text numberText = new Text(tile.getTileType().toString());
         numberText.setTextAlignment(TextAlignment.LEFT);
         numberText.setFont(Font.font(9));
-        numberText.setTranslateX(center.getX()-RADIUS/6);
-        numberText.setTranslateY(center.getY()-RADIUS/4);
+        numberText.setTranslateX(center.getX()-tile.getRadius()/6);
+        numberText.setTranslateY(center.getY()-tile.getRadius()/4);
         return numberText;
     }
 
