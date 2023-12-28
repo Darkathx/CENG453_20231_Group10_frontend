@@ -4,6 +4,7 @@ import java.util.Map;
 
 public class Settlement {
     private Vertex location;
+    private boolean isCity = false;
 
     public static final Map<ResourceType, Integer> COST = Map.of(
             ResourceType.BRICK, 1,
@@ -11,9 +12,14 @@ public class Settlement {
             ResourceType.GRAIN, 1,
             ResourceType.WOOL, 1
     );
+    public static final Map<ResourceType, Integer> COST_CITY = Map.of(
+            ResourceType.GRAIN, 2,
+            ResourceType.ORE, 3
+    );
 
     public Settlement(Vertex location) {
         this.location = location;
+        this.isCity = false;
     }
 
     public Vertex getLocation(){
@@ -22,5 +28,8 @@ public class Settlement {
 
     public void setLocation(Vertex location){
         this.location = location;
+    }
+    public void upgradeToCity(){
+        this.isCity = true;
     }
 }

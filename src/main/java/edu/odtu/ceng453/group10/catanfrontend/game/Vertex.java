@@ -13,6 +13,7 @@ public class Vertex {
 
     private Point2D position;
     private Settlement settlement;
+    private City city;
     private Player owner;
     private String key;
     private List<Edge> connectedEdges;
@@ -82,5 +83,13 @@ public class Vertex {
     public Set<Tile> getAdjacentTiles() {
         LOGGER.info("get adjacent tile: " + adjacentTiles);
         return this.adjacentTiles;
+    }
+
+    public boolean hasSettlement() {
+        return this.settlement != null;
+    }
+
+    public boolean hasCity() {
+        return this.city != null;
     }
 }

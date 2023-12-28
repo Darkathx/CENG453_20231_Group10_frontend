@@ -48,6 +48,7 @@ public class GameClient {
   public void playSingleGame(Stage stage) {
     state.initializeSingleGame(username);
     gameController.setupInitialBoard();
+    gameController.performCPUTurn();
     boardView.updateBoardView(state);
     stage.setScene(getGameScene(stage));
   }

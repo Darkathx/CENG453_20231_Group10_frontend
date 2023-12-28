@@ -29,6 +29,7 @@ public class Board {
         createTiles(tilesList);
         assignNumbersToTiles(tilesList);
         setTilePositions(tilesList);
+        this.setTiles(tilesList);
         return tilesList;
     }
     private void createTiles(List<Tile> tilesList){
@@ -87,7 +88,7 @@ public class Board {
     }
 
     private void assignNumbersToTiles(List<Tile> tilesList) {
-        List<Integer> numbers = new ArrayList<>(List.of(2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 12));
+        List<Integer> numbers = new ArrayList<>(List.of(2, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 12));
         Collections.shuffle(numbers);
 
         int numberIndex = 0;
@@ -195,19 +196,4 @@ public class Board {
                 .collect(Collectors.toList());
     }
 
-    public boolean addSettlement(Vertex vertex, Settlement settlement) {
-        if (vertex.isAvailable()) {
-            vertex.buildSettlement(settlement);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean addRoad(Edge edge, Road road) {
-        if (edge.isAvailable()) {
-            edge.buildRoad(road);
-            return true;
-        }
-        return false;
-    }
 }
