@@ -66,6 +66,31 @@ public class Player {
         }
     }
 
+    public void addResourceForCity(Settlement settlement){ // TODO: change settlement with city
+        Set<Tile> adjacentTiles = settlement.getLocation().getAdjacentTiles();
+        for(Tile tile: adjacentTiles){
+            if(tile.getResourceType() != null){
+                resourceCards.addResource(tile.getResourceType(),2);
+            }
+        }
+    }
+
+    public void addResourcesAccordingToDiceRoll(int diceRoll){
+        if(diceRoll == 7){
+            return;
+        }
+        for(Settlement settlement: settlements){
+            for(Tile tile: settlement.getLocation().getAdjacentTiles()){
+                if(tile.getNumber() == diceRoll){
+                    if(settlement.isCity())
+                        resourceCards.addResource(tile.getResourceType(),2);
+                    else
+                        resourceCards.addResource(tile.getResourceType(),1);
+                }
+            }
+        }
+    }
+
     public List<Settlement> getSettlements() {
         return settlements;
     }
@@ -113,6 +138,7 @@ public class Player {
         }
         return false;
     }
+
     public boolean isAI() {
         // Example check for an AI player, modify as needed
         return this.name.startsWith("AI");

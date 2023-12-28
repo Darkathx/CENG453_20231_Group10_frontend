@@ -17,6 +17,19 @@ public class Settlement {
             ResourceType.ORE, 3
     );
 
+    public static final Map<ResourceType, Integer> CITY_COST = Map.of(
+            ResourceType.GRAIN, 2,
+            ResourceType.ORE, 3
+    );
+
+    public boolean isCity() {
+        return isCity;
+    }
+
+    public void setCity() {
+        isCity = true;
+    }
+
     public Settlement(Vertex location) {
         this.location = location;
         this.isCity = false;
