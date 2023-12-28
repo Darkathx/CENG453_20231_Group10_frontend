@@ -3,11 +3,8 @@ package edu.odtu.ceng453.group10.catanfrontend.game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import edu.odtu.ceng453.group10.catanfrontend.GameController;
 import javafx.scene.paint.Color;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
 public class Player {
     private String name;
@@ -17,7 +14,6 @@ public class Player {
     private int points;
     private Color playerColor;
     private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
-
 
 
     public Player(String name, ResourceCardDeck resourceCards, Color color) {
