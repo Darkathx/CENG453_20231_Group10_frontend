@@ -54,7 +54,7 @@ public class GameController {
 
   public boolean buildCity(Player player, Vertex vertex) {
     if (!vertex.isAvailable() && vertex.getOwner() == player) {
-      return player.buildCity(vertex.getSettlement());
+      return player.upgradeToCity(vertex.getSettlement());
     }
     return false;
   }
