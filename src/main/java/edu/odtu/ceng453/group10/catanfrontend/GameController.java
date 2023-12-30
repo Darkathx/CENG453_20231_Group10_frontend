@@ -125,7 +125,6 @@ public class GameController {
 
     // End the CPU's turn
     nextTurn();
-    performCPUTurn();
   }
 
   private int rollDice(Player player) {

@@ -49,9 +49,11 @@ public class GameClient {
   public void playSingleGame(Stage stage) {
     state.initializeSingleGame(username);
     gameController.setupInitialBoard();
-    gameController.performCPUTurn();
-    boardView.updateBoardView(state);
-    stage.setScene(getGameScene(stage));
+    while(!isPlayerTurn()) {
+      gameController.performCPUTurn();
+      boardView.updateBoardView(state);
+      stage.setScene(getGameScene(stage));
+    }
   }
 
   public Scene getGameScene(Stage gameStage) {
@@ -66,6 +68,7 @@ public class GameClient {
       gameStage.close();
       System.exit(0);
     }
+    boardView.updateBoardView(state);
     BorderPane totalPane = new BorderPane();
     BorderPane.setAlignment(boardView, Pos.CENTER);
     totalPane.setCenter(boardView);
@@ -116,8 +119,11 @@ public class GameClient {
       state.setCurrentPlayerIndex((state.getCurrentPlayerIndex() + 1) % state.getPlayers().size());
       state.unsetDiceRolled();
       // Refresh the game scene for the next player
-      gameController.performCPUTurn();
-      stage.setScene(getGameScene(stage));
+      while(!isPlayerTurn()) {
+        gameController.performCPUTurn();
+        boardView.updateBoardView(state);
+        stage.setScene(getGameScene(stage));
+      }
     });
     endTurnButton.setDisable(!isPlayerTurn() || !state.getDiceRolled());
     return endTurnButton;
