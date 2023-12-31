@@ -38,6 +38,7 @@ public class Player {
     public int getPoints() {
         return points;
     }
+
     public Color getPlayerColor() {
         return playerColor;
     }
@@ -45,6 +46,10 @@ public class Player {
     public int addPoints(int points) {
         this.points += points;
         return this.points;
+    }
+
+    public void decrPoints(int points) {
+        this.points -= points;
     }
 
     public ResourceCardDeck getResources() {

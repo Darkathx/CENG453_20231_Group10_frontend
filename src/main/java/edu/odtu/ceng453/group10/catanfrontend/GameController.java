@@ -1,5 +1,7 @@
 package edu.odtu.ceng453.group10.catanfrontend;
 
+import java.util.HashSet;
+import java.util.Set;
 import javafx.scene.chart.LineChart;
 import org.springframework.stereotype.Component;
 import edu.odtu.ceng453.group10.catanfrontend.game.*;
@@ -38,6 +40,48 @@ public class GameController {
       roadEdge.buildRoad(road); // Directly build without checking resources
       player.getRoads().add(road);
     }
+  }
+
+  public void findLongestPath() {
+    List<Player> players = gameState.getPlayers();
+    int max = 0;
+    Player maxPlayer = null;
+    for(Player player : players) {
+      List<Road> roads = player.getRoads();
+      for(Road road : roads) {
+        Set<Edge> edges = new HashSet<>();
+        int length = findLongestPathHelper(player, edges, road.getLocation(), 0);
+        if(length >= 5 && length > max) {
+          max = length;
+          maxPlayer = player;
+        }
+      }
+    }
+    if(maxPlayer != null) {
+      Player former = gameState.getLongestPathPlayer();
+      if(former != null) {
+        former.decrPoints(max);
+      }
+      maxPlayer.addPoints(2);
+      gameState.setLongestPathPlayer(maxPlayer);
+    }
+  }
+
+  private int findLongestPathHelper(Player player, Set<Edge> path, Edge edge, int length) {
+    if(edge.getOwner() == null || edge.getOwner() != player || path.contains(edge)) {
+      return length;
+    }
+    path.add(edge);
+    int maxLength = length + 1;
+    Set<Edge> adjacentEdges = edge.getAdjacentEdges();
+    for(Edge adjacentEdge : adjacentEdges) {
+      int newLength = findLongestPathHelper(player, path, adjacentEdge, maxLength);
+      if(newLength > maxLength) {
+        maxLength = newLength;
+      }
+    }
+    path.remove(edge);
+    return maxLength;
   }
 
 

@@ -16,6 +16,8 @@ public class GameState {
     private int currentPlayerIndex;
     private int[] lastDiceRoll;
     private boolean diceRolled;
+    private int longestPathLength;
+    private Player longestPathPlayer;
 
 
     public GameState() {
@@ -25,6 +27,8 @@ public class GameState {
         lastDiceRoll[0] = 1;
         lastDiceRoll[1] = 1;
         diceRolled = false;
+        longestPathLength = 0;
+        longestPathPlayer = null;
     }
 
     public Board getBoard() {
@@ -33,6 +37,14 @@ public class GameState {
 
     public List<Player> getPlayers() {
         return players;
+    }
+
+    public Player getLongestPathPlayer() {
+        return longestPathPlayer;
+    }
+
+    public void setLongestPathPlayer(Player player) {
+        this.longestPathPlayer = player;
     }
 
     public int[] getLastDiceRoll() {
@@ -79,5 +91,14 @@ public class GameState {
     }
     private void randomStartingPlayer() {
         currentPlayerIndex = (int) (Math.random() * 4);
+    }
+
+    public int getLongestPathLength() {
+        return longestPathLength;
+    }
+
+    public void setLongestPathLength(int longestPathLength, Player player) {
+        this.longestPathLength = longestPathLength;
+        this.longestPathPlayer = player;
     }
 }

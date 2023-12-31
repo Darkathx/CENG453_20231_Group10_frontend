@@ -51,6 +51,7 @@ public class GameClient {
     gameController.setupInitialBoard();
     while(!isPlayerTurn()) {
       gameController.performCPUTurn();
+      gameController.findLongestPath();
       boardView.updateBoardView(state);
       stage.setScene(getGameScene(stage));
     }
@@ -83,7 +84,10 @@ public class GameClient {
     VBox rightContainer = new VBox(100);
     rightContainer.setAlignment(Pos.CENTER);
     Text currentTurn = new Text("Current Turn: " + state.getCurrentPlayer().getName());
-    rightContainer.getChildren().addAll(currentTurn, scoreboardComponent.getScoreboard(state));
+    Player longestPathPlayer = state.getLongestPathPlayer();
+    String name = longestPathPlayer == null ? "None" : longestPathPlayer.getName();
+    Text currentLongestPathInfo = new Text("Longest Path Player and Length: " + name + " " + state.getLongestPathLength());
+    rightContainer.getChildren().addAll(currentTurn, currentLongestPathInfo, scoreboardComponent.getScoreboard(state));
     totalPane.setRight(rightContainer);
 
     Scene gameScene = new Scene(totalPane);
@@ -121,6 +125,7 @@ public class GameClient {
       // Refresh the game scene for the next player
       while(!isPlayerTurn()) {
         gameController.performCPUTurn();
+        gameController.findLongestPath();
         boardView.updateBoardView(state);
         stage.setScene(getGameScene(stage));
       }
