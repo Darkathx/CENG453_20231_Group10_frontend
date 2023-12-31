@@ -109,6 +109,10 @@ public class Player {
         this.roads = roads;
     }
 
+    public List<City> getCities() {
+        return cities;
+    }
+
     public boolean canBuildSettlement() {
         // Example resource check; details depend on ResourceCardDeck implementation
         return resourceCards.canDeduct(Settlement.COST);
