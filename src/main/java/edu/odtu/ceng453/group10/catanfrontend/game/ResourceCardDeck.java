@@ -17,6 +17,10 @@ public class ResourceCardDeck {
         resources.put(type, resources.getOrDefault(type, 0) + amount);
     }
 
+    public void setResource(ResourceType type, int amount) {
+        resources.put(type, amount);
+    }
+
     public boolean canDeduct(Map<ResourceType, Integer> cost) {
         for (Map.Entry<ResourceType, Integer> entry : cost.entrySet()) {
             if (resources.getOrDefault(entry.getKey(), 0) < entry.getValue()) {

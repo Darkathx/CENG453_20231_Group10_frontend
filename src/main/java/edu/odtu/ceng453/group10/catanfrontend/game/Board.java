@@ -163,6 +163,15 @@ public class Board {
         }
     }
 
+    public Vertex getVertex(String key) {
+        return vertexMap.get(key);
+    }
+
+    public Edge getEdge(String key, String key2) {
+        String edgeKey = key.compareTo(key2) < 0 ? key + "-" + key2 : key2 + "-" + key;
+        return edgeMap.get(edgeKey);
+    }
+
 
     private Edge findOrCreateEdgeBetween(Vertex vertex1, Vertex vertex2) {
         String vertex1Key = vertex1.getKey(); // Assuming Vertex class has a method to get a unique key

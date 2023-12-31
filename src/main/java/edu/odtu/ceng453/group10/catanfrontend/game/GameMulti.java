@@ -16,6 +16,29 @@ public class GameMulti {
     this.gameStateId = gameStateId;
   }
 
+  public void setGameId(String gameId) {
+    this.gameId = gameId;
+  }
+
+  public void setGameStateId(String gameStateId) {
+    this.gameStateId = gameStateId;
+  }
+
+  public String getGameId() {
+    return gameId;
+  }
+
+  public String getGameStateId() {
+    return gameStateId;
+  }
+
+  public void updateGameState(GameStateResponse response, GameState state) {
+    state.setCurrentPlayerIndex(response.playerTurn());
+    state.setLastDiceRoll(new int[]{response.dice1(), response.dice2()});
+    updateResources(response, state);
+    updateBuildings(response, state);
+  }
+
   public GameStateResponse prepareGameStateResponse(GameState state) {
     return new GameStateResponse(
         gameStateId,
@@ -88,4 +111,46 @@ public class GameMulti {
     }
     return buildings;
   }
+
+  private void updateResources(GameStateResponse response, GameState state) {
+    List<Player> players = state.getPlayers();
+    List<Resources> resources = response.resources();
+    for(int i = 0; i < players.size(); i++) {
+      Player player = players.get(i);
+      ResourceCardDeck deck = player.getResources();
+      Resources resource = resources.get(i);
+      deck.setResource(ResourceType.BRICK, resource.brick());
+      deck.setResource(ResourceType.LUMBER, resource.lumber());
+      deck.setResource(ResourceType.WOOL, resource.wool());
+      deck.setResource(ResourceType.GRAIN, resource.grain());
+      deck.setResource(ResourceType.ORE, resource.ore());
+    }
+  }
+
+
+  //TODO: FINISH THIS
+  private void updateBuildings(GameStateResponse response, GameState state) {
+    List<Player> players = state.getPlayers();
+    List<Buildings> buildings = response.buildings();
+    Board board = state.getBoard();
+    for(Buildings building : buildings) {
+      Player player = players.get(building.user());
+      switch(building.type()) {
+        case BuildingType.SETTLEMENT:
+          Vertex vertex = board.getVertex(building.vertexKey1());
+          if(vertex.hasSettlement()) break;
+
+          break;
+        case BuildingType.ROAD:
+          Edge edge = board.getEdge(building.vertexKey1(), building.vertexKey2());
+          if(!edge.isAvailable()) break;
+
+          break;
+        case BuildingType.CITY:
+          player.addCity(state.getBoard().getVertex(building.location()));
+          break;
+      }
+    }
+  }
+
 }

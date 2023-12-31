@@ -4,6 +4,7 @@ package edu.odtu.ceng453.group10.catanfrontend.requests;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.fasterxml.jackson.databind.util.JSONWrappedObject;
 import edu.odtu.ceng453.group10.catanfrontend.config.LeaderboardType;
+import edu.odtu.ceng453.group10.catanfrontend.game.GameState;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.HttpEntity;
@@ -163,6 +164,45 @@ public class Request {
     }
     catch(RestClientException e) {
       return new GameResponse("", "", "", "", "");
+    }
+  }
+
+  public GameStateResponse getGameStateRequest(String gameId) {
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    MultiValueMap<String, String> body= new LinkedMultiValueMap<>();
+    body.add("gameId", gameId);
+    HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+    try {
+      HttpEntity<GameStateResponse> response = restTemplate.exchange(
+          STATE_URL,
+          HttpMethod.GET,
+          entity,
+          GameStateResponse.class
+      );
+      return response.getBody();
+    }
+    catch(RestClientException e) {
+      return null;
+    }
+  }
+
+  public GameStateResponse updateGameStateRequest(GameStateResponse gameStateResponse) {
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    HttpEntity<GameStateResponse> entity = new HttpEntity<>(gameStateResponse, headers);
+    try {
+      HttpEntity<GameStateResponse> response = restTemplate.exchange(
+          STATE_URL,
+          HttpMethod.POST,
+          entity,
+          GameStateResponse.class
+      );
+      return response.getBody();
+    }
+    catch(RestClientException e) {
+      return new GameStateResponse("", "", 0, 0, 0, null, null);
     }
   }
 

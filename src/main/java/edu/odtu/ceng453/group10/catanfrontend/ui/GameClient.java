@@ -1,9 +1,13 @@
 package edu.odtu.ceng453.group10.catanfrontend.ui;
 
 import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
+import edu.odtu.ceng453.group10.catanfrontend.game.GameMulti;
 import edu.odtu.ceng453.group10.catanfrontend.game.GameState;
 import edu.odtu.ceng453.group10.catanfrontend.GameController;
+import edu.odtu.ceng453.group10.catanfrontend.game.MultiplayerPoll;
 import edu.odtu.ceng453.group10.catanfrontend.game.Player;
+import edu.odtu.ceng453.group10.catanfrontend.requests.GameResponse;
+import edu.odtu.ceng453.group10.catanfrontend.requests.GameStateResponse;
 import edu.odtu.ceng453.group10.catanfrontend.requests.LoginResponse;
 import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
 import java.util.ArrayList;
@@ -30,6 +34,7 @@ public class GameClient {
   private ResourcesComponent resourcesComponent;
   private ScoreboardComponent scoreboardComponent;
   private DiceComponent diceComponent;
+  private GameMulti gameMulti;
 
   public GameClient(GameState gameState, DiceComponent diceComponent,
                     ResourcesComponent resourcesComponent, ScoreboardComponent scoreboardComponent,
@@ -40,6 +45,7 @@ public class GameClient {
     this.resourcesComponent = resourcesComponent;
     this.scoreboardComponent = scoreboardComponent;
     this.boardView = new BoardView(gameState, gameController);
+    gameMulti = null;
   }
 
   public String getUsername() {
@@ -59,6 +65,23 @@ public class GameClient {
       boardView.updateBoardView(state);
       stage.setScene(getGameScene(stage));
     }
+  }
+
+  public void playMultiGame(Stage stage) {
+    Request request = new Request();
+    GameResponse gameResponse = request.sendJoinRequest(username);
+    gameMulti = new GameMulti(gameResponse.id(), null);
+    if(gameResponse.p4() != null) {
+      gameController.setupInitialBoard();
+      GameStateResponse gameStateResponse = request.updateGameStateRequest(gameMulti.prepareGameStateResponse(state));
+      gameMulti.setGameStateId(gameStateResponse.id());
+      stage.setScene(getGameScene(stage));
+    }
+    else {
+      stage.setScene(getWaitingScene(stage));
+    }
+    Thread thread = new Thread(new MultiplayerPoll(state, this, gameController, gameMulti));
+    thread.start();
   }
 
   public Scene getGameScene(Stage gameStage) {
@@ -169,6 +192,14 @@ public class GameClient {
       }
     }
     return winnerPlayer;
+  }
+
+  private Scene getWaitingScene(Stage gameStage) {
+    GridPane waitingPane = new GridPane();
+    waitingPane.setAlignment(Pos.CENTER);
+    Text waitingText = new Text("Waiting for other players...");
+    waitingPane.add(waitingText, 0, 0);
+    return new Scene(waitingPane, Settings.getWidth(), Settings.getHeight());
   }
 
 
