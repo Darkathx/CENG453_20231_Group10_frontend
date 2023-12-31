@@ -147,7 +147,7 @@ public class GameMulti {
 
           break;
         case BuildingType.CITY:
-          player.addCity(state.getBoard().getVertex(building.location()));
+          
           break;
       }
     }
