@@ -83,12 +83,10 @@ public class GameClient {
     }
     else {
       stage.setScene(getWaitingScene(stage));
-      InitialPoll initialPoll = new InitialPoll(state, this, gameController, gameMulti);
+      InitialPoll initialPoll = new InitialPoll(state, this, gameController, gameMulti, stage);
       Thread thread = new Thread(initialPoll);
       thread.start();
     }
-    Thread thread = new Thread(new MultiplayerPoll(state, this, gameController, gameMulti));
-    thread.start();
   }
 
   public Scene getGameScene(Stage gameStage) {
