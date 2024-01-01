@@ -96,13 +96,6 @@ public class GameController {
     return false;
   }
 
-  public boolean buildCity(Player player, Vertex vertex) {
-    if (!vertex.isAvailable() && vertex.getOwner() == player) {
-      return player.upgradeToCity(vertex.getSettlement());
-    }
-    return false;
-  }
-
   public boolean buildRoad(Player player, Edge edge) {
     if (edge.isAvailable()) {
       Road road = new Road(edge);
@@ -132,7 +125,8 @@ public class GameController {
     gameState.setCurrentPlayerIndex(currentPlayerIndex);
   }
   public boolean upgradeSettlementToCity(Player player, Settlement settlement) {
-    return player.upgradeToCity(settlement);
+    City city = new City(settlement.getLocation());
+    return player.upgradeToCity(settlement, city);
   }
 
   public void performCPUTurn() {

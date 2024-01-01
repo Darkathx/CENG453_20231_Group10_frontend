@@ -84,11 +84,16 @@ public class Player {
         for(Settlement settlement: settlements){
             for(Tile tile: settlement.getLocation().getAdjacentTiles()){
                 if(tile.getNumber() == diceRoll){
-                    if(settlement.isCity())
-                        resourceCards.addResource(tile.getResourceType(),2);
-                    else
-                        resourceCards.addResource(tile.getResourceType(),1);
+                    resourceCards.addResource(tile.getResourceType(),1);
                 }
+            }
+        }
+        for(City city : cities) {
+            for(Tile tile : city.getLocation().getAdjacentTiles()) {
+                if(tile.getNumber() == diceRoll) {
+                    resourceCards.addResource(tile.getResourceType(), 2);
+                }
+
             }
         }
     }
@@ -127,13 +132,17 @@ public class Player {
         return false;
     }
 
+    public void addSettlement(Settlement settlement) {
+        settlements.add(settlement);
+    }
+
     public boolean canBuildRoad() {
         // Example resource check; details depend on ResourceCardDeck implementation
         return resourceCards.canDeduct(Road.COST);
     }
-    public boolean canUpgradeToCity() {
+    public boolean canUpgradeToCity(Vertex vertex) {
         // Example resource check; details depend on ResourceCardDeck implementation
-        return resourceCards.canDeduct(City.COST);
+        return resourceCards.canDeduct(City.COST) && vertex.hasSettlement() && !vertex.hasCity();
     }
 
     public boolean buildRoad(Road road) {
@@ -149,12 +158,21 @@ public class Player {
         // Example check for an AI player, modify as needed
         return this.name.startsWith("AI");
     }
-    public boolean upgradeToCity(Settlement settlement){
-        if(canUpgradeToCity()){
-            settlement.upgradeToCity();
-            resourceCards.deduct(Settlement.COST_CITY);
+    public boolean upgradeToCity(Settlement settlement, City city){
+        Vertex vertex = settlement.getLocation();
+        if(canUpgradeToCity(vertex)){
+            vertex.removeSettlement();
+            vertex.buildCity(city);
+            resourceCards.deduct(City.COST);
             return true;
         }
         return false;
+    }
+
+    public boolean costlessUpgrade(Settlement settlement, City city) {
+        Vertex vertex = settlement.getLocation();
+        vertex.removeSettlement();
+        vertex.buildCity(city);
+        return true;
     }
 }

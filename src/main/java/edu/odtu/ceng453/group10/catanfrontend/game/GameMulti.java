@@ -133,21 +133,27 @@ public class GameMulti {
     List<Player> players = state.getPlayers();
     List<Buildings> buildings = response.buildings();
     Board board = state.getBoard();
+    Vertex vertex;
     for(Buildings building : buildings) {
       Player player = players.get(building.user());
       switch(building.type()) {
         case BuildingType.SETTLEMENT:
-          Vertex vertex = board.getVertex(building.vertexKey1());
+          vertex = board.getVertex(building.vertexKey1());
           if(vertex.hasSettlement()) break;
-
+          Settlement settlement = new Settlement(vertex);
+          player.addSettlement(settlement);
+          vertex.buildSettlement(settlement);
           break;
         case BuildingType.ROAD:
           Edge edge = board.getEdge(building.vertexKey1(), building.vertexKey2());
           if(!edge.isAvailable()) break;
-
+          edge.buildRoad(new Road(edge));
           break;
         case BuildingType.CITY:
-          
+          vertex = board.getVertex(building.vertexKey1());
+          if(vertex.hasCity()) break;
+          City city = new City(vertex);
+          player.costlessUpgrade(vertex.getSettlement(), city);
           break;
       }
     }
