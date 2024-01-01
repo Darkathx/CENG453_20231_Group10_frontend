@@ -33,6 +33,8 @@ public class GameMulti {
   }
 
   public void updateGameState(GameStateResponse response, GameState state) {
+    setGameId(response.gameId());
+    setGameStateId(response.id());
     state.setCurrentPlayerIndex(response.playerTurn());
     state.setLastDiceRoll(new int[]{response.dice1(), response.dice2()});
     updateResources(response, state);

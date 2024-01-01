@@ -4,6 +4,7 @@ import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
 import edu.odtu.ceng453.group10.catanfrontend.game.GameMulti;
 import edu.odtu.ceng453.group10.catanfrontend.game.GameState;
 import edu.odtu.ceng453.group10.catanfrontend.GameController;
+import edu.odtu.ceng453.group10.catanfrontend.game.InitialPoll;
 import edu.odtu.ceng453.group10.catanfrontend.game.MultiplayerPoll;
 import edu.odtu.ceng453.group10.catanfrontend.game.Player;
 import edu.odtu.ceng453.group10.catanfrontend.requests.GameResponse;
@@ -76,9 +77,15 @@ public class GameClient {
       GameStateResponse gameStateResponse = request.updateGameStateRequest(gameMulti.prepareGameStateResponse(state));
       gameMulti.setGameStateId(gameStateResponse.id());
       stage.setScene(getGameScene(stage));
+      MultiplayerPoll poll = new MultiplayerPoll(state, this, gameController, gameMulti);
+      Thread thread = new Thread(poll);
+      thread.start();
     }
     else {
       stage.setScene(getWaitingScene(stage));
+      InitialPoll initialPoll = new InitialPoll(state, this, gameController, gameMulti);
+      Thread thread = new Thread(initialPoll);
+      thread.start();
     }
     Thread thread = new Thread(new MultiplayerPoll(state, this, gameController, gameMulti));
     thread.start();

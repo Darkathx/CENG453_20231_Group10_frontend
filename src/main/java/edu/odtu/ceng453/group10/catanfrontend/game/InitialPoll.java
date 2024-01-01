@@ -6,13 +6,13 @@ import edu.odtu.ceng453.group10.catanfrontend.requests.GameStateResponse;
 import edu.odtu.ceng453.group10.catanfrontend.requests.Request;
 import edu.odtu.ceng453.group10.catanfrontend.ui.GameClient;
 
-public class MultiplayerPoll implements Runnable {
+public class InitialPoll implements Runnable {
   private final GameState gameState;
   private final GameClient gameClient;
   private final GameController gameController;
   private final GameMulti multi;
 
-  public MultiplayerPoll(GameState gameState, GameClient gameClient, GameController gameController, GameMulti multi) {
+  public InitialPoll(GameState gameState, GameClient gameClient, GameController gameController, GameMulti multi) {
     this.gameState = gameState;
     this.gameClient = gameClient;
     this.gameController = gameController;
@@ -23,7 +23,15 @@ public class MultiplayerPoll implements Runnable {
   public void run() {
     Request request = new Request();
     while(true) {
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      GameStateResponse response = request.getGameStateRequest(multi.getGameStateId());
+      if(response != null) {
 
+      }
     }
 
   }

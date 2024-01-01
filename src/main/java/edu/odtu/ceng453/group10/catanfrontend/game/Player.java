@@ -140,9 +140,9 @@ public class Player {
         // Example resource check; details depend on ResourceCardDeck implementation
         return resourceCards.canDeduct(Road.COST);
     }
-    public boolean canUpgradeToCity(Vertex vertex) {
+    public boolean canUpgradeToCity() {
         // Example resource check; details depend on ResourceCardDeck implementation
-        return resourceCards.canDeduct(City.COST) && vertex.hasSettlement() && !vertex.hasCity();
+        return resourceCards.canDeduct(City.COST);
     }
 
     public boolean buildRoad(Road road) {
@@ -160,7 +160,7 @@ public class Player {
     }
     public boolean upgradeToCity(Settlement settlement, City city){
         Vertex vertex = settlement.getLocation();
-        if(canUpgradeToCity(vertex)){
+        if(canUpgradeToCity() && vertex.hasSettlement() && !vertex.hasCity()){
             vertex.removeSettlement();
             vertex.buildCity(city);
             resourceCards.deduct(City.COST);
