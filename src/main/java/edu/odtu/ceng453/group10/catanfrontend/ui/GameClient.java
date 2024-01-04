@@ -72,12 +72,12 @@ public class GameClient {
     Request request = new Request();
     GameResponse gameResponse = request.sendJoinRequest(username);
     gameMulti = new GameMulti(gameResponse.id(), null);
-    if(gameResponse.p4() != null) {
+    if(gameResponse.players().get(1) != null) {
       gameController.setupInitialBoard();
       GameStateResponse gameStateResponse = request.updateGameStateRequest(gameMulti.prepareGameStateResponse(state));
       gameMulti.setGameStateId(gameStateResponse.id());
       stage.setScene(getGameScene(stage));
-      MultiplayerPoll poll = new MultiplayerPoll(state, this, gameController, gameMulti);
+      MultiplayerPoll poll = new MultiplayerPoll(state, this, gameController, gameMulti, stage);
       Thread thread = new Thread(poll);
       thread.start();
     }
@@ -132,6 +132,49 @@ public class GameClient {
     return gameScene;
   }
 
+  public Scene getMultiScene(Stage gameStage) {
+    Player winnerPlayer = checkWinCondition();
+    if(winnerPlayer != null) {
+      Request request = new Request();
+      request.saveGameResult(winnerPlayer.getName(), winnerPlayer.getPoints());
+      Alert alert = new Alert(Alert.AlertType.INFORMATION);
+      alert.setTitle("Game Over");
+      alert.setContentText("Winner is " + winnerPlayer.getName() + " with " + winnerPlayer.getPoints() + " points!");
+      alert.showAndWait();
+      gameStage.close();
+      System.exit(0);
+    }
+    boardView.updateBoardView(state);
+    BorderPane totalPane = new BorderPane();
+    BorderPane.setAlignment(boardView, Pos.CENTER);
+    totalPane.setCenter(boardView);
+
+    HBox bottomContainer = new HBox(250);
+    bottomContainer.setAlignment(Pos.CENTER);
+    GridPane diceContainer = diceComponent.getNewComponent(state);
+    diceContainer.add(getRollButton(gameStage), 1, 1);
+    bottomContainer.getChildren().addAll(diceContainer, getMultiEndTurnButton(gameStage), resourcesComponent.getNewComponent(state));
+    totalPane.setBottom(bottomContainer);
+
+    VBox rightContainer = new VBox(100);
+    rightContainer.setAlignment(Pos.CENTER);
+    Text currentTurn = new Text("Current Turn: " + state.getCurrentPlayer().getName());
+    Player longestPathPlayer = state.getLongestPathPlayer();
+    String name = longestPathPlayer == null ? "None" : longestPathPlayer.getName();
+    Text currentLongestPathInfo = new Text("Longest Path Player and Length: " + name + " " + state.getLongestPathLength());
+    rightContainer.getChildren().addAll(currentTurn, currentLongestPathInfo, scoreboardComponent.getScoreboard(state));
+    totalPane.setRight(rightContainer);
+
+    Scene gameScene = new Scene(totalPane);
+    gameScene.setOnKeyPressed(e -> {
+      if(e.getCode() == KeyCode.ESCAPE) {
+        gameStage.setScene(getEscScene(gameStage));
+      }
+    });
+
+    return gameScene;
+  }
+
   private Button getRollButton(Stage stage) {
     Button rollButton = new Button("Roll Dice");
     rollButton.setOnAction(e -> {
@@ -161,6 +204,19 @@ public class GameClient {
         boardView.updateBoardView(state);
         stage.setScene(getGameScene(stage));
       }
+    });
+    endTurnButton.setDisable(!isPlayerTurn() || !state.getDiceRolled());
+    return endTurnButton;
+  }
+
+  private Button getMultiEndTurnButton(Stage stage) {
+    Button endTurnButton = new Button("End Turn");
+    endTurnButton.setOnAction(e -> {
+      state.setCurrentPlayerIndex((state.getCurrentPlayerIndex() + 1) % state.getPlayers().size());
+      state.unsetDiceRolled();
+      // Refresh the game scene for the next player
+      Thread thread = new Thread(new MultiplayerPoll(state, this, gameController, gameMulti, stage));
+      thread.start();
     });
     endTurnButton.setDisable(!isPlayerTurn() || !state.getDiceRolled());
     return endTurnButton;

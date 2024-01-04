@@ -1,9 +1,10 @@
 package edu.odtu.ceng453.group10.catanfrontend.requests;
 
+import java.util.List;
+
 public record GameResponse(
     String id,
-    String p1,
-    String p2,
-    String p3,
-    String p4
+    String stateId,
+    List<String> players,
+    int playerCount
 ) {}

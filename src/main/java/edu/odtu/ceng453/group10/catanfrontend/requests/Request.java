@@ -163,7 +163,7 @@ public class Request {
       return response.getBody();
     }
     catch(RestClientException e) {
-      return new GameResponse("", "", "", "", "");
+      return null;
     }
   }
 
