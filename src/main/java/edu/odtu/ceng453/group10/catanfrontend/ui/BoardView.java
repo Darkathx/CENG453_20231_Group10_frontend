@@ -32,7 +32,7 @@ public class BoardView extends Pane {
         List<Tile> tiles = state.getBoard().getTiles();
         for (Tile tile : tiles) {
             this.getChildren().add(tile.getHexagon());
-            if (tile.getNumber() != null) {
+            if (tile.getNumber() != null && tile.getNumber() != 1) {
                 Text numberText = createNumberText(tile);
                 this.getChildren().add(numberText);
             }
@@ -64,8 +64,12 @@ public class BoardView extends Pane {
     public void drawInteractiveComponents(GameState gameState) {
         // Draw available settlements and roads
         for(Player player : gameState.getPlayers()){
-            drawEdge(player.getRoads().getFirst().getLocation(), player);
-            drawVertex(player.getSettlements().getFirst().getLocation(), player);
+            for(Road road : player.getRoads()){
+                drawEdge(road.getLocation(), player);
+            }
+            for(Settlement settlement : player.getSettlements()){
+                drawVertex(settlement.getLocation(), player);
+            }
         }
         for(Tile tile : gameState.getBoard().getTiles()){
             for(Vertex vertex : tile.getVertices()){
