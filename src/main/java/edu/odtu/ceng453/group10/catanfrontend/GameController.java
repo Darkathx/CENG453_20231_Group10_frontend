@@ -88,20 +88,24 @@ public class GameController {
   public boolean buildSettlement(Player player, Vertex vertex) {
     if (vertex.isAvailable()) {
       Settlement settlement = new Settlement(vertex);
-      player.buildSettlement(settlement);
       vertex.buildSettlement(settlement);
-      vertex.setOwner(player);
+      vertex.setOwner(player);// Directly build without checking resources
+      player.getSettlements().add(settlement);
+      player.buildSettlement(settlement);
+      player.addResourceForSettlement(settlement);
       return true;
     }
     return false;
   }
 
   public boolean buildRoad(Player player, Edge edge) {
+    LOGGER.info("Trying to build road at edge: " + edge);
     if (edge.isAvailable()) {
+      LOGGER.info("Building road at edge: " + edge);
       Road road = new Road(edge);
       player.buildRoad(road);
-      edge.buildRoad(road);
-      edge.setOwner(player);
+      edge.buildRoad(road); // Directly build without checking resources
+      player.getRoads().add(road);
       return true;
     }
     return false;
@@ -146,13 +150,15 @@ public class GameController {
     if (currentPlayer.canBuildRoad()) {
       // Build road at a random available position
       Edge randomEdge = getRandomAvailableEdgeForPlayer(currentPlayer);
-      buildRoad(currentPlayer, randomEdge);
+      if (randomEdge != null)
+        buildRoad(currentPlayer, randomEdge);
     }
 
     if (currentPlayer.canBuildSettlement()) {
       // Build settlement at a valid location
       Vertex randomVertex = getRandomAvailableVertexForPlayer(currentPlayer);
-      buildSettlement(currentPlayer, randomVertex);
+      if (randomVertex != null)
+        buildSettlement(currentPlayer, randomVertex);
     }
 
     if (currentPlayer.canUpgradeToCity()) {
@@ -172,7 +178,6 @@ public class GameController {
   public void distributeResources(int diceRoll) {
     List<Tile> tiles = gameState.getBoard().getTiles();
     for (Tile tile : tiles) {
-      LOGGER.info("tile number: " + tile.getNumber());
       if (tile.getNumber() != null && tile.getNumber() == diceRoll && tile.getResourceType() != null) {
         distributeResourcesFromTile(tile);
       }

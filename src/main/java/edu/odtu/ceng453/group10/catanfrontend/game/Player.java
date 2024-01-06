@@ -20,6 +20,10 @@ public class Player {
     public Player(String name, ResourceCardDeck resourceCards, Color color) {
         this.name = name;
         this.resourceCards = resourceCards;
+        this.resourceCards.addResource(ResourceType.BRICK, 3);
+        this.resourceCards.addResource(ResourceType.LUMBER, 3);
+        this.resourceCards.addResource(ResourceType.GRAIN, 1);
+        this.resourceCards.addResource(ResourceType.WOOL, 1);
         this.settlements = new ArrayList<>();
         this.roads = new ArrayList<>();
         this.points = 0;
@@ -88,14 +92,17 @@ public class Player {
                 }
             }
         }
-        for(City city : cities) {
-            for(Tile tile : city.getLocation().getAdjacentTiles()) {
-                if(tile.getNumber() == diceRoll) {
-                    resourceCards.addResource(tile.getResourceType(), 2);
-                }
+        if(cities != null){
+            for(City city : cities) {
+                for(Tile tile : city.getLocation().getAdjacentTiles()) {
+                    if(tile.getNumber() == diceRoll) {
+                        resourceCards.addResource(tile.getResourceType(), 2);
+                    }
 
+                }
             }
         }
+
     }
 
     public List<Settlement> getSettlements() {

@@ -1,5 +1,7 @@
 package edu.odtu.ceng453.group10.catanfrontend.game;
 
+import javafx.geometry.Point2D;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,12 +12,17 @@ public class Edge {
     private Vertex vertex2;
     private Player owner;
     private Road road;
+    private Point2D centerVertex;
 
     public Edge(Vertex vertex1, Vertex vertex2) {
         this.vertex1 = vertex1;
         this.vertex2 = vertex2;
         this.owner = null;
         this.road = null;
+        //center vertex is the midpoint of the edge between vertex1 vertex2
+        double x = (vertex1.getPosition().getX() + vertex2.getPosition().getX()) / 2;
+        double y = (vertex1.getPosition().getY() + vertex2.getPosition().getY()) / 2;
+        this.centerVertex = new Point2D(x, y);
     }
 
     // Getters and setters
@@ -78,5 +85,11 @@ public class Edge {
             adjacentEdges.addAll(vertex2.getConnectedEdges());
         }
         return adjacentEdges;
+    }
+    public Point2D getCenterVertex() {
+        return centerVertex;
+    }
+    public Point2D setCenterVertex(Point2D centerVertex) {
+        return this.centerVertex = centerVertex;
     }
 }

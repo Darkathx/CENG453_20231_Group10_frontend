@@ -34,7 +34,7 @@ public class Board {
     }
     private void createTiles(List<Tile> tilesList){
         // Create one desert tile without a resource type or number
-        tilesList.add(new Tile(TileType.DESERT, null, null, 0, 0));
+        tilesList.add(new Tile(TileType.DESERT, null, 1, 0, 0));
 
         // Add other types of tiles
         addTilesOfType(tilesList, TileType.HILL, 3, ResourceType.BRICK);
@@ -154,10 +154,9 @@ public class Board {
             return existingVertex;
         } else {
             Point2D position = calculateVertexPosition(tile, vertexIndex);
-            Vertex newVertex = new Vertex(position, tile.getRow(), tile.getCol(), vertexIndex);
+            Vertex newVertex = new Vertex(position);
             newVertex.addAdjacentTile(tile);
             newVertex.setKey(vertexKey);
-            LOGGER.info("Created new vertex: " + newVertex.getKey());
             vertexMap.put(vertexKey, newVertex);
             return newVertex;
         }
