@@ -89,7 +89,7 @@ public class GameController {
       Settlement settlement = new Settlement(vertex);
       vertex.buildSettlement(settlement);
       vertex.setOwner(player);// Directly build without checking resources
-      player.getSettlements().add(settlement);
+      //player.getSettlements().add(settlement);
       player.buildSettlement(settlement);
       player.addResourceForSettlement(settlement);
 
@@ -104,13 +104,19 @@ public class GameController {
       LOGGER.info("Building road at edge: " + edge);
       Road road = new Road(edge);
       player.buildRoad(road);
-      edge.buildRoad(road); // Directly build without checking resources
+      edge.buildRoad(road);
+      //edge.buildRoad(road); // Directly build without checking resources
       player.getRoads().add(road);
       return true;
     }
     return false;
   }
-
+  public boolean upgradeSettlementToCity(Player player, Settlement settlement) {
+    City city = new City(settlement.getLocation());
+    player.upgradeToCity(settlement, city);
+    settlement.getLocation().buildCity(city);
+    return player.upgradeToCity(settlement, city);
+  }
   private List<Vertex> getAllAvailableVertices() {
     List<Vertex> availableVertices = new ArrayList<>(gameState.getBoard().getAvailableVertices());
     List<Vertex> verticesToRemove = new ArrayList<>();
@@ -148,10 +154,7 @@ public class GameController {
     currentPlayerIndex = (currentPlayerIndex + 1) % gameState.getPlayers().size();
     gameState.setCurrentPlayerIndex(currentPlayerIndex);
   }
-  public boolean upgradeSettlementToCity(Player player, Settlement settlement) {
-    City city = new City(settlement.getLocation());
-    return player.upgradeToCity(settlement, city);
-  }
+
 
   public void performCPUTurn() {
     Player currentPlayer = getCurrentPlayer();

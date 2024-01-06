@@ -102,7 +102,8 @@ public class BoardView extends Pane {
         this.getChildren().add(settlementText);
     }
     private void drawCity(Vertex vertex, Player player) {
-        Rectangle vertexGraphic = new Rectangle(vertex.getPosition().getX(), vertex.getPosition().getY(), 2*VERTEX_RADIUS, 2*VERTEX_RADIUS);
+        Rectangle vertexGraphic = new Rectangle(vertex.getPosition().getX()-VERTEX_RADIUS, vertex.getPosition().getY()+VERTEX_RADIUS, 2*VERTEX_RADIUS, 2*VERTEX_RADIUS);
+        vertexGraphic.setFill(player.getPlayerColor());
         vertexGraphic.setStroke(player.getPlayerColor());
         this.getChildren().add(vertexGraphic);
         Point2D center = vertex.getPosition();
@@ -131,6 +132,7 @@ public class BoardView extends Pane {
                 if (availableVertices.contains(vertex) && !vertex.hasSettlement()) {
                     gameController.buildSettlement(currentPlayer, vertex);
                     drawSettlement(vertex, currentPlayer);
+                    availableVertices.remove(vertex);
                 }
             }
         }
@@ -147,6 +149,7 @@ public class BoardView extends Pane {
         if (availableEdges.contains(edge) && currentPlayer.canBuildRoad()) {
             gameController.buildRoad(currentPlayer, edge);
             drawRoad(edge, currentPlayer);
+            availableEdges.remove(edge);
         }
     }
 
