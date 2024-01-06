@@ -1,7 +1,6 @@
 package edu.odtu.ceng453.group10.catanfrontend.ui;
 
 import edu.odtu.ceng453.group10.catanfrontend.game.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -11,7 +10,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.geometry.Point2D;
-import edu.odtu.ceng453.group10.catanfrontend.config.Settings;
 import edu.odtu.ceng453.group10.catanfrontend.GameController;
 import java.util.List;
 
@@ -65,11 +63,17 @@ public class BoardView extends Pane {
         // Draw available settlements and roads
         for(Player player : gameState.getPlayers()){
             for(Road road : player.getRoads()){
-                drawEdge(road.getLocation(), player);
+                drawRoad(road.getLocation(), player);
             }
             for(Settlement settlement : player.getSettlements()){
-                drawVertex(settlement.getLocation(), player);
+                drawSettlement(settlement.getLocation(), player);
             }
+            if(player.cities != null){
+                for(City city : player.getCities()){
+                    drawCity(city.getLocation(), player);
+                }
+            }
+
         }
         for(Tile tile : gameState.getBoard().getTiles()){
             for(Vertex vertex : tile.getVertices()){
@@ -85,14 +89,31 @@ public class BoardView extends Pane {
         }
     }
 
-    private void drawVertex(Vertex vertex, Player player) {
+    private void drawSettlement(Vertex vertex, Player player) {
         Circle vertexGraphic = new Circle(vertex.getPosition().getX(), vertex.getPosition().getY(), VERTEX_RADIUS, player.getPlayerColor());
         vertexGraphic.setStroke(player.getPlayerColor());
         vertexGraphic.setOnMouseClicked(event -> handleVertexClick(vertex));
         this.getChildren().add(vertexGraphic);
+        Point2D center = vertex.getPosition();
+        Text settlementText = new Text("S");
+        settlementText.setTextAlignment(TextAlignment.CENTER);
+        settlementText.setTranslateX(center.getX());
+        settlementText.setTranslateY(center.getY());
+        this.getChildren().add(settlementText);
+    }
+    private void drawCity(Vertex vertex, Player player) {
+        Rectangle vertexGraphic = new Rectangle(vertex.getPosition().getX(), vertex.getPosition().getY(), 2*VERTEX_RADIUS, 2*VERTEX_RADIUS);
+        vertexGraphic.setStroke(player.getPlayerColor());
+        this.getChildren().add(vertexGraphic);
+        Point2D center = vertex.getPosition();
+        Text cityText = new Text("C");
+        cityText.setTextAlignment(TextAlignment.CENTER);
+        cityText.setTranslateX(center.getX());
+        cityText.setTranslateY(center.getY());
+        this.getChildren().add(cityText);
     }
 
-    private void drawEdge(Edge edge, Player player) {
+    private void drawRoad(Edge edge, Player player) {
         Line edgeGraphic = new Line(edge.getVertex1().getPosition().getX(), edge.getVertex1().getPosition().getY(),
                 edge.getVertex2().getPosition().getX(), edge.getVertex2().getPosition().getY());
         edgeGraphic.setStroke(player.getPlayerColor());
@@ -101,23 +122,33 @@ public class BoardView extends Pane {
         this.getChildren().add(edgeGraphic);
     }
 
+
     private void handleVertexClick(Vertex vertex) {
         Player currentPlayer = gameController.getCurrentPlayer();
-        if (vertex.isAvailable() && currentPlayer.canBuildSettlement()) {
-            gameController.buildSettlement(currentPlayer, vertex);
-            drawVertex(vertex, currentPlayer);
+        List<Vertex> availableVertices = gameController.getAvailableVerticesForPlayer(currentPlayer);
+        if (currentPlayer.canBuildSettlement()) {
+            if (availableVertices != null) {
+                if (availableVertices.contains(vertex) && !vertex.hasSettlement()) {
+                    gameController.buildSettlement(currentPlayer, vertex);
+                    drawSettlement(vertex, currentPlayer);
+                }
+            }
         }
+        else if(vertex.hasSettlement() && !vertex.hasCity() && currentPlayer.canUpgradeToCity()){
+            gameController.upgradeSettlementToCity(currentPlayer, vertex.getSettlement());
+            drawCity(vertex, currentPlayer);
+        }
+
     }
 
     private void handleEdgeClick(Edge edge) {
         Player currentPlayer = gameController.getCurrentPlayer();
-        if (edge.isAvailable() && currentPlayer.canBuildRoad()) {
+        List<Edge> availableEdges = gameController.getAvailableEdgesForPlayer(currentPlayer);
+        if (availableEdges.contains(edge) && currentPlayer.canBuildRoad()) {
             gameController.buildRoad(currentPlayer, edge);
-            drawEdge(edge, currentPlayer);
+            drawRoad(edge, currentPlayer);
         }
     }
-
-
 
     public void updateBoardView(GameState gameState) {
         this.getChildren().clear();

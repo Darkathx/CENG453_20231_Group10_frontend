@@ -134,6 +134,7 @@ public class Player {
         if (settlement.getLocation().isAvailable() && canBuildSettlement()) {
             settlements.add(settlement);
             resourceCards.deduct(Settlement.COST);
+            this.addPoints(1);
             return true;
         }
         return false;
@@ -171,6 +172,7 @@ public class Player {
             vertex.removeSettlement();
             vertex.buildCity(city);
             resourceCards.deduct(City.COST);
+            this.addPoints(1);
             return true;
         }
         return false;
@@ -181,5 +183,8 @@ public class Player {
         vertex.removeSettlement();
         vertex.buildCity(city);
         return true;
+    }
+    public void addResource(ResourceType resourceType, int amount) {
+        this.resourceCards.addResource(resourceType, amount);
     }
 }

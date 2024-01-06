@@ -58,6 +58,7 @@ public class GameClient {
   }
 
   public void playSingleGame(Stage stage) {
+    this.boardView = new BoardView(state, gameController);
     state.initializeSingleGame(username);
     gameController.setupInitialBoard();
     while(!isPlayerTurn()) {

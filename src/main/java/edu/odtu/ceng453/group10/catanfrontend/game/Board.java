@@ -191,11 +191,9 @@ public class Board {
     }
 
     public List<Vertex> getAvailableVertices() {
-        List<Vertex> availableVertices = vertexMap.values().stream()
-                .filter(Vertex::isAvailable)
-                .collect(Collectors.toList());
+        return new ArrayList<>(vertexMap.values());
 
-        return availableVertices;
+
     }
 
     public List<Edge> getConnectedAvailableEdges(Vertex vertex) {
