@@ -45,10 +45,9 @@ public class PlayScreen {
     });
     Button multiPlayer = new Button("Multi-player Mode");
     multiPlayer.setOnAction(e -> {
-      Alert todo = new Alert(AlertType.ERROR);
-      todo.setHeaderText("TODO ERROR");
-      todo.setContentText("Multiplayer mode is not finished.");
-      todo.showAndWait();
+      Stage gameStage = new Stage();
+      client.playMultiGame(gameStage);
+      gameStage.show();
     });
     GridPane playPane = new GridPane();
     playPane.setAlignment(Pos.CENTER);

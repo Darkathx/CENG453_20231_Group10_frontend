@@ -1,5 +1,7 @@
 package edu.odtu.ceng453.group10.catanfrontend;
 
+import java.util.HashSet;
+import java.util.Set;
 import javafx.scene.chart.LineChart;
 import org.springframework.stereotype.Component;
 import edu.odtu.ceng453.group10.catanfrontend.game.*;
@@ -40,6 +42,48 @@ public class GameController {
     }
   }
 
+  public void findLongestPath() {
+    List<Player> players = gameState.getPlayers();
+    int max = 0;
+    Player maxPlayer = null;
+    for(Player player : players) {
+      List<Road> roads = player.getRoads();
+      for(Road road : roads) {
+        Set<Edge> edges = new HashSet<>();
+        int length = findLongestPathHelper(player, edges, road.getLocation(), 0);
+        if(length >= 5 && length > max) {
+          max = length;
+          maxPlayer = player;
+        }
+      }
+    }
+    if(maxPlayer != null) {
+      Player former = gameState.getLongestPathPlayer();
+      if(former != null) {
+        former.decrPoints(max);
+      }
+      maxPlayer.addPoints(2);
+      gameState.setLongestPathPlayer(maxPlayer);
+    }
+  }
+
+  private int findLongestPathHelper(Player player, Set<Edge> path, Edge edge, int length) {
+    if(edge.getOwner() == null || edge.getOwner() != player || path.contains(edge)) {
+      return length;
+    }
+    path.add(edge);
+    int maxLength = length + 1;
+    Set<Edge> adjacentEdges = edge.getAdjacentEdges();
+    for(Edge adjacentEdge : adjacentEdges) {
+      int newLength = findLongestPathHelper(player, path, adjacentEdge, maxLength);
+      if(newLength > maxLength) {
+        maxLength = newLength;
+      }
+    }
+    path.remove(edge);
+    return maxLength;
+  }
+
 
   public boolean buildSettlement(Player player, Vertex vertex) {
     if (vertex.isAvailable()) {
@@ -48,13 +92,6 @@ public class GameController {
       vertex.buildSettlement(settlement);
       vertex.setOwner(player);
       return true;
-    }
-    return false;
-  }
-
-  public boolean buildCity(Player player, Vertex vertex) {
-    if (!vertex.isAvailable() && vertex.getOwner() == player) {
-      return player.upgradeToCity(vertex.getSettlement());
     }
     return false;
   }
@@ -88,7 +125,8 @@ public class GameController {
     gameState.setCurrentPlayerIndex(currentPlayerIndex);
   }
   public boolean upgradeSettlementToCity(Player player, Settlement settlement) {
-    return player.upgradeToCity(settlement);
+    City city = new City(settlement.getLocation());
+    return player.upgradeToCity(settlement, city);
   }
 
   public void performCPUTurn() {

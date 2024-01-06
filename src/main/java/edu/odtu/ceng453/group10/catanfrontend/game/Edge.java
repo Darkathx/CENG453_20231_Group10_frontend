@@ -1,7 +1,9 @@
 package edu.odtu.ceng453.group10.catanfrontend.game;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Edge {
     private Vertex vertex1;
@@ -65,5 +67,16 @@ public class Edge {
             adjacentTiles.addAll(vertex2.getAdjacentTiles());
         }
         return adjacentTiles;
+    }
+
+    public Set<Edge> getAdjacentEdges() {
+        Set<Edge> adjacentEdges = new HashSet<>();
+        if (vertex1 != null) {
+            adjacentEdges.addAll(vertex1.getConnectedEdges());
+        }
+        if (vertex2 != null) {
+            adjacentEdges.addAll(vertex2.getConnectedEdges());
+        }
+        return adjacentEdges;
     }
 }

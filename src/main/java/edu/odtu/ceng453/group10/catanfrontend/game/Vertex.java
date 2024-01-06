@@ -59,7 +59,7 @@ public class Vertex {
     }
 
     public boolean isAvailable() {
-        return settlement == null;
+        return (settlement == null || city == null);
     }
 
     public Settlement getSettlement() {
@@ -70,13 +70,26 @@ public class Vertex {
         return connectedEdges;
     }
 
-    public boolean buildSettlement(Settlement settlement){
+    public void buildSettlement(Settlement settlement){
         if(this.settlement == null){
             this.settlement = settlement;
-            return true;
         }
-        return false;
     }
+
+    public void removeSettlement() {
+        this.settlement = null;
+    }
+
+    public void buildCity(City city){
+        if(this.city == null){
+            this.city = city;
+        }
+    }
+
+    public City getCity() {
+        return city;
+    }
+
     public void addAdjacentTile(Tile tile) {
         adjacentTiles.add(tile);
     }
