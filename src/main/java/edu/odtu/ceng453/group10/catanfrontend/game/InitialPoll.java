@@ -31,13 +31,14 @@ public class InitialPoll implements Runnable {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      GameStateResponse response = request.getGameStateRequest(multi.getGameStateId());
+      GameStateResponse response = request.getGameStateRequest(multi.getGameId());
       if(response != null) {
         multi.updateGameState(response, gameState);
-        stage.setScene(gameClient.getGameScene(stage));
-        MultiplayerPoll poll = new MultiplayerPoll(gameState, gameClient, gameController, multi);
+        stage.setScene(gameClient.getMultiScene(stage));
+        MultiplayerPoll poll = new MultiplayerPoll(gameState, gameClient, gameController, multi, stage);
         Thread thread = new Thread(poll);
         thread.start();
+        break;
       }
     }
 
