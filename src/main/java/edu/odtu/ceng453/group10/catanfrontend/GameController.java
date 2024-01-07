@@ -45,7 +45,7 @@ public class GameController {
     List<Player> players = gameState.getPlayers();
     for(int i = 0; i < 2; i++) {
       Player player = players.get(i);
-      Vertex settlementVertex = getRandomAvailableVertex();
+      Vertex settlementVertex = getRandomAvailableVertexForPlayer(player);
       Settlement settlement = new Settlement(settlementVertex);
       settlementVertex.buildSettlement(settlement);
       settlementVertex.setOwner(player);// Directly build without checking resources
@@ -72,6 +72,7 @@ public class GameController {
         if(length >= 5 && length > max) {
           max = length;
           maxPlayer = player;
+
         }
       }
     }
@@ -118,14 +119,13 @@ public class GameController {
   }
 
   public boolean buildRoad(Player player, Edge edge) {
-    LOGGER.info("Trying to build road at edge: " + edge);
     if (edge.isAvailable()) {
-      LOGGER.info("Building road at edge: " + edge);
       Road road = new Road(edge);
       player.buildRoad(road);
       edge.buildRoad(road);
+      edge.setOwner(player);
       //edge.buildRoad(road); // Directly build without checking resources
-      player.getRoads().add(road);
+      //player.getRoads().add(road);
       return true;
     }
     return false;
