@@ -79,7 +79,7 @@ public class GameState {
         return players.get(currentPlayerIndex);
     }
     public static final Color[] PLAYER_COLORS = {
-            Color.RED, Color.BLUE, Color.PURPLE, Color.BLACK
+            Color.RED, Color.BLUE, Color.PURPLE, Color.MAGENTA
     };
     public void initializeSingleGame(String username) {
         players.add(new Player(username, new ResourceCardDeck(), PLAYER_COLORS[0]));

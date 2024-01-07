@@ -2,7 +2,7 @@ package edu.odtu.ceng453.group10.catanfrontend;
 
 import java.util.HashSet;
 import java.util.Set;
-import javafx.scene.chart.LineChart;
+
 import org.springframework.stereotype.Component;
 import edu.odtu.ceng453.group10.catanfrontend.game.*;
 
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
 @Component
 public class GameController {
@@ -27,18 +26,18 @@ public class GameController {
     LOGGER.info("Setting up the initial board.");
 
     for (Player player : gameState.getPlayers()) {
-      Vertex settlementVertex = getRandomAvailableVertex();
-      Settlement settlement = new Settlement(settlementVertex);
-      settlementVertex.buildSettlement(settlement);
-      settlementVertex.setOwner(player);// Directly build without checking resources
-      player.getSettlements().add(settlement);
-      player.addResourceForSettlement(settlement);
+      Vertex settlementVertex = getAvailableVertex();
+      this.buildSettlement(player, settlementVertex);
+      player.addResource(ResourceType.BRICK, 1);
+      player.addResource(ResourceType.LUMBER, 1);
+      player.addResource(ResourceType.GRAIN, 1);
+      player.addResource(ResourceType.WOOL, 1);
 
       // Select a random edge connected to the settlement vertex for the initial road
       Edge roadEdge = getRandomAvailableEdge(settlementVertex);
-      Road road = new Road(roadEdge);
-      roadEdge.buildRoad(road); // Directly build without checking resources
-      player.getRoads().add(road);
+      this.buildRoad(player, roadEdge);
+      player.addResource(ResourceType.BRICK, 1);
+      player.addResource(ResourceType.LUMBER, 1);
     }
   }
 
@@ -107,32 +106,63 @@ public class GameController {
   public boolean buildSettlement(Player player, Vertex vertex) {
     if (vertex.isAvailable()) {
       Settlement settlement = new Settlement(vertex);
-      player.buildSettlement(settlement);
       vertex.buildSettlement(settlement);
-      vertex.setOwner(player);
+      vertex.setOwner(player);// Directly build without checking resources
+      //player.getSettlements().add(settlement);
+      player.buildSettlement(settlement);
+      player.addResourceForSettlement(settlement);
+
       return true;
     }
     return false;
   }
 
   public boolean buildRoad(Player player, Edge edge) {
+    LOGGER.info("Trying to build road at edge: " + edge);
     if (edge.isAvailable()) {
+      LOGGER.info("Building road at edge: " + edge);
       Road road = new Road(edge);
       player.buildRoad(road);
       edge.buildRoad(road);
-      edge.setOwner(player);
+      //edge.buildRoad(road); // Directly build without checking resources
+      player.getRoads().add(road);
       return true;
     }
     return false;
   }
+  public boolean upgradeSettlementToCity(Player player, Settlement settlement) {
+    City city = new City(settlement.getLocation());
+    player.upgradeToCity(settlement, city);
+    settlement.getLocation().buildCity(city);
+    return player.upgradeToCity(settlement, city);
+  }
+  private List<Vertex> getAllAvailableVertices() {
+    List<Vertex> availableVertices = new ArrayList<>(gameState.getBoard().getAvailableVertices());
+    List<Vertex> verticesToRemove = new ArrayList<>();
 
-  private Vertex getRandomAvailableVertex() {
-    List<Vertex> availableVertices = gameState.getBoard().getAvailableVertices();
-    return availableVertices.get(random.nextInt(availableVertices.size()));
+    for (Vertex vertex : availableVertices) {
+      if(vertex.hasSettlement()){
+        for (Edge edge : vertex.getConnectedEdges()) {
+          verticesToRemove.add(edge.getVertex1());
+          verticesToRemove.add(edge.getVertex2());
+        }
+      }
+    }
+
+    availableVertices.removeAll(verticesToRemove);
+    availableVertices.removeIf(Vertex::hasSettlement);
+
+    return availableVertices.isEmpty() ? null : availableVertices;
+  }
+
+  private Vertex getAvailableVertex() {
+    List<Vertex> availableVertices = getAllAvailableVertices();
+    return availableVertices == null ? null : availableVertices.get(random.nextInt(availableVertices.size()));
   }
 
   private Edge getRandomAvailableEdge(Vertex vertex) {
     List<Edge> connectedEdges = gameState.getBoard().getConnectedAvailableEdges(vertex);
+    connectedEdges.removeIf(Edge -> !Edge.isAvailable());
     return connectedEdges.get(random.nextInt(connectedEdges.size()));
   }
   public Player getCurrentPlayer() {
@@ -143,10 +173,7 @@ public class GameController {
     currentPlayerIndex = (currentPlayerIndex + 1) % gameState.getPlayers().size();
     gameState.setCurrentPlayerIndex(currentPlayerIndex);
   }
-  public boolean upgradeSettlementToCity(Player player, Settlement settlement) {
-    City city = new City(settlement.getLocation());
-    return player.upgradeToCity(settlement, city);
-  }
+
 
   public void performCPUTurn() {
     Player currentPlayer = getCurrentPlayer();
@@ -165,13 +192,15 @@ public class GameController {
     if (currentPlayer.canBuildRoad()) {
       // Build road at a random available position
       Edge randomEdge = getRandomAvailableEdgeForPlayer(currentPlayer);
-      buildRoad(currentPlayer, randomEdge);
+      if (randomEdge != null)
+        buildRoad(currentPlayer, randomEdge);
     }
 
     if (currentPlayer.canBuildSettlement()) {
       // Build settlement at a valid location
       Vertex randomVertex = getRandomAvailableVertexForPlayer(currentPlayer);
-      buildSettlement(currentPlayer, randomVertex);
+      if (randomVertex != null)
+        buildSettlement(currentPlayer, randomVertex);
     }
 
     if (currentPlayer.canUpgradeToCity()) {
@@ -191,7 +220,6 @@ public class GameController {
   public void distributeResources(int diceRoll) {
     List<Tile> tiles = gameState.getBoard().getTiles();
     for (Tile tile : tiles) {
-      LOGGER.info("tile number: " + tile.getNumber());
       if (tile.getNumber() != null && tile.getNumber() == diceRoll && tile.getResourceType() != null) {
         distributeResourcesFromTile(tile);
       }
@@ -213,7 +241,7 @@ public class GameController {
   }
 
 
-  private Edge getRandomAvailableEdgeForPlayer(Player player) {
+  public List<Edge> getAvailableEdgesForPlayer(Player player) {
     List<Edge> availableEdges = new ArrayList<>();
     for (Road road : player.getRoads()) {
       for (Edge edge : road.getLocation().getVertex1().getConnectedEdges()) {
@@ -221,33 +249,49 @@ public class GameController {
           availableEdges.add(edge);
         }
       }
+      for (Edge edge : road.getLocation().getVertex2().getConnectedEdges()) {
+        if (edge.isAvailable()) {
+          availableEdges.add(edge);
+        }
+      }
+    }
+    for (Settlement settlement : player.getSettlements()) {
+      for (Edge edge : settlement.getLocation().getConnectedEdges()) {
+        if (edge.isAvailable()) {
+          availableEdges.add(edge);
+        }
+      }
     }
     if (!availableEdges.isEmpty()) {
-      return availableEdges.get(random.nextInt(availableEdges.size()));
+      return availableEdges;
     }
     return null; // Or handle this case appropriately
   }
 
+  private Edge getRandomAvailableEdgeForPlayer(Player player){
+    List<Edge> allAvailableEdges = getAvailableEdgesForPlayer(player);
+    return allAvailableEdges == null ? null : allAvailableEdges.get(random.nextInt(allAvailableEdges.size()));
+  }
 
-  private Vertex getRandomAvailableVertexForPlayer(Player player) {
+  public List<Vertex> getAvailableVerticesForPlayer(Player player) {
+    List<Vertex> allAvailableVertices = getAllAvailableVertices();
     List<Vertex> availableVertices = new ArrayList<>();
     for (Road road : player.getRoads()) {
-      addVertexIfSuitable(road.getLocation().getVertex1(), availableVertices);
-      addVertexIfSuitable(road.getLocation().getVertex2(), availableVertices);
-    }
+        if(allAvailableVertices.contains(road.getLocation().getVertex1()))
+          availableVertices.add(road.getLocation().getVertex1());
+        if(allAvailableVertices.contains(road.getLocation().getVertex2()))
+          availableVertices.add(road.getLocation().getVertex2());
+      }
+
     if (!availableVertices.isEmpty()) {
-      return availableVertices.get(random.nextInt(availableVertices.size()));
+      return availableVertices;
     }
     return null; // Or handle this case appropriately
   }
-
-  private void addVertexIfSuitable(Vertex vertex, List<Vertex> availableVertices) {
-    if (vertex.isAvailable()) {
-      availableVertices.add(vertex);
-    }
+  private Vertex getRandomAvailableVertexForPlayer(Player player){
+    List<Vertex> allAvailableVertices = getAvailableVerticesForPlayer(player);
+    return allAvailableVertices == null ? null : allAvailableVertices.get(random.nextInt(allAvailableVertices.size()));
   }
-
-
   private Settlement getRandomSettlement(Player player) {
     List<Settlement> settlements = player.getSettlements();
     if (!settlements.isEmpty()) {

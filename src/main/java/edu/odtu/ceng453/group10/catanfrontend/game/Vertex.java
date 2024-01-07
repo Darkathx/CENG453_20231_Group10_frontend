@@ -19,7 +19,7 @@ public class Vertex {
     private List<Edge> connectedEdges;
     private Set<Tile> adjacentTiles;
 
-    public Vertex(Point2D position, int row, int col, int vertexIndex) {
+    public Vertex(Point2D position) {
         this.position = position;
         this.settlement = null;
         this.owner = null;
