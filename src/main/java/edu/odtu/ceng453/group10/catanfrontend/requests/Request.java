@@ -7,6 +7,7 @@ import edu.odtu.ceng453.group10.catanfrontend.config.LeaderboardType;
 import edu.odtu.ceng453.group10.catanfrontend.game.GameState;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -160,9 +161,11 @@ public class Request {
           entity,
           GameResponse.class
       );
+      System.out.println("Request Success " + response.getBody());
       return response.getBody();
     }
     catch(RestClientException e) {
+      e.printStackTrace();
       return null;
     }
   }
@@ -181,9 +184,11 @@ public class Request {
           entity,
           GameStateResponse.class
       );
+      System.out.println("Request Success " + response.getBody());
       return response.getBody();
     }
     catch(RestClientException e) {
+      e.printStackTrace();
       return null;
     }
   }
@@ -199,10 +204,12 @@ public class Request {
           entity,
           GameStateResponse.class
       );
+      System.out.println("Request Success " + response.getBody());
       return response.getBody();
     }
     catch(RestClientException e) {
-      return new GameStateResponse("", "", 0, 0, 0, null, null);
+      e.printStackTrace();
+      return null;
     }
   }
 

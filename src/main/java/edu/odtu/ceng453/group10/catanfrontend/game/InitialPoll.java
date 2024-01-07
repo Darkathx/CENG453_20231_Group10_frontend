@@ -31,7 +31,7 @@ public class InitialPoll implements Runnable {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      GameStateResponse response = request.getGameStateRequest(multi.getGameStateId());
+      GameStateResponse response = request.getGameStateRequest(multi.getGameId());
       if(response != null) {
         multi.updateGameState(response, gameState);
         stage.setScene(gameClient.getMultiScene(stage));

@@ -42,6 +42,25 @@ public class GameController {
     }
   }
 
+  public void setupMultiBoard() {
+    List<Player> players = gameState.getPlayers();
+    for(int i = 0; i < 2; i++) {
+      Player player = players.get(i);
+      Vertex settlementVertex = getRandomAvailableVertex();
+      Settlement settlement = new Settlement(settlementVertex);
+      settlementVertex.buildSettlement(settlement);
+      settlementVertex.setOwner(player);// Directly build without checking resources
+      player.getSettlements().add(settlement);
+      player.addResourceForSettlement(settlement);
+
+      // Select a random edge connected to the settlement vertex for the initial road
+      Edge roadEdge = getRandomAvailableEdge(settlementVertex);
+      Road road = new Road(roadEdge);
+      roadEdge.buildRoad(road); // Directly build without checking resources
+      player.getRoads().add(road);
+    }
+  }
+
   public void findLongestPath() {
     List<Player> players = gameState.getPlayers();
     int max = 0;

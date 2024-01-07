@@ -89,6 +89,12 @@ public class GameState {
         players.add(new Player("AI3", new ResourceCardDeck(), PLAYER_COLORS[3]));
         randomStartingPlayer();
     }
+
+    public void initializeMultiGame(List<String> usernames) {
+        players.add(new Player(usernames.get(0), new ResourceCardDeck(), PLAYER_COLORS[0]));
+        players.add(new Player(usernames.get(1), new ResourceCardDeck(), PLAYER_COLORS[1]));
+        randomStartingPlayer();
+    }
     private void randomStartingPlayer() {
         currentPlayerIndex = (int) (Math.random() * 4);
     }

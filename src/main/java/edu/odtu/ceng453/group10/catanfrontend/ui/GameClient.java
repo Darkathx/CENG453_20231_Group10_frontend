@@ -73,7 +73,7 @@ public class GameClient {
     GameResponse gameResponse = request.sendJoinRequest(username);
     gameMulti = new GameMulti(gameResponse.id(), null);
     if(gameResponse.players().get(1) != null) {
-      gameController.setupInitialBoard();
+      gameController.setupMultiBoard();
       GameStateResponse gameStateResponse = request.updateGameStateRequest(gameMulti.prepareGameStateResponse(state));
       gameMulti.setGameStateId(gameStateResponse.id());
       stage.setScene(getGameScene(stage));
@@ -212,7 +212,7 @@ public class GameClient {
   private Button getMultiEndTurnButton(Stage stage) {
     Button endTurnButton = new Button("End Turn");
     endTurnButton.setOnAction(e -> {
-      state.setCurrentPlayerIndex((state.getCurrentPlayerIndex() + 1) % state.getPlayers().size());
+      state.setCurrentPlayerIndex((state.getCurrentPlayerIndex() + 1) % 2);
       state.unsetDiceRolled();
       // Refresh the game scene for the next player
       Thread thread = new Thread(new MultiplayerPoll(state, this, gameController, gameMulti, stage));
